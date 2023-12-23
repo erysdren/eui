@@ -19,9 +19,10 @@ You must also define the `EUI_PIXEL_DEPTH` preprocessor macro. Valid values: 8, 
 
 ## Tested Compilers & Platforms
 
-- GCC (Linux, DOS)
+- GCC (Linux, Windows, DOS16, DOS32)
 - Clang (Linux)
-- Watcom (DOS)
+- Watcom (DOS16, DOS32)
+- TCC (Linux)
 
 ## Credits
 
