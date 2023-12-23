@@ -16,6 +16,7 @@
 # linux executables
 /source/test_sdl2_01
 /source/test_sdl2_02
+/source/test_tcc
 
 # result from test_ia16.com
 /source/screen.dat

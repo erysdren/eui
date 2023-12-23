@@ -24,7 +24,7 @@ SOFTWARE.
 
 /*
  *
- * TEST_WATCOM16.C
+ * TEST_BASIC.C
  *
  */
 

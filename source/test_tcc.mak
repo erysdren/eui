@@ -1,15 +1,13 @@
 
 # static variables
-CC = ia16-elf-gcc
-LD = ia16-elf-ld
-AS = ia16-elf-as
+CC = tcc
 RM ?= rm -f
 
 # base cflags
-override CFLAGS += -pedantic -Wall -Wextra -DEUI_PIXEL_DEPTH=8
+override CFLAGS += -DEUI_PIXEL_DEPTH=8
 
 # executable name
-EXEC ?= test_ia16.com
+EXEC ?= test_tcc
 
 # objects
 OBJECTS = test_basic.o eui.o

@@ -12,7 +12,7 @@ CFLAGS=-DEUI_PIXEL_DEPTH=8 -bt=$(SYS)
 TARGET=test_watcom16.exe
 
 # objects
-OBJECTS=test_watcom16.obj eui.obj
+OBJECTS=test_basic.obj eui.obj
 
 # clean and build executable
 all: clean $(TARGET)
