@@ -25,7 +25,7 @@ SOFTWARE.
 
 /*
  *
- * TEST_DJGPP.C
+ * TEST_IA16.C
  *
  */
 
