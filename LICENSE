@@ -1,28 +1,6 @@
-
-![EUI Example](./.github/eui.png "EUI Example")
-
-# EUI
-
-EUI is a small UI and drawing library designed for homebrew games, debug UIs, embedded systems, and low resolution or low color depth displays.
-
-The main EUI library is only two files, [`eui.c`](./source/eui.c) and [`eui.h`](./source/eui.h). To add EUI to your project, just clone the files into your source tree and compile.
-
-## Source Code Guide
-
-- [`eui.c`](./source/eui.c) & [`eui.h`](./source/eui.h): Main platform agnostic EUI library.
-- [`eui_sdl2.c`](./source/eui_sdl2.c) & [`eui_sdl2.h`](./source/eui_sdl2.h): Helper functions for integration with SDL2.
-
-## Credits
-
-- EUI uses [Daniel Hepper's font8x8](https://github.com/dhepper/font8x8/) (License: Public Domain).
-- EUI uses code ported from [Shpuld's SUI](https://github.com/shpuld/sui-qc/) (License: MIT).
-
-## License
-
 MIT License
 
 Copyright (c) 2018 shpuld
-
 Copyright (c) 2023 erysdren (it/she/they)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
