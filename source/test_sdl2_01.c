@@ -152,7 +152,10 @@ int main(int argc, char **argv)
 			eui_set_align(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
 
 			/* button */
-			eui_button(EUI_VEC2(0, 0), EUI_VEC2(128, 16), "My Cool Button", my_cool_button_callback, NULL);
+			if (eui_button(EUI_VEC2(0, 0), EUI_VEC2(128, 16), "My Cool Button", my_cool_button_callback, NULL))
+			{
+				eui_text(EUI_VEC2(0, 24), 15, "Hovered");
+			}
 
 			/* end eui */
 			eui_end();
