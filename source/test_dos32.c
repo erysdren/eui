@@ -36,15 +36,25 @@ SOFTWARE.
 #include <dos.h>
 #include <conio.h>
 
+#ifdef __DJGPP__
+#include <dpmi.h>
+#include <go32.h>
+#include <sys/nearptr.h>
+#include <sys/farptr.h>
+#define VGA_MEMORY (0xA0000 + __djgpp_conventional_base)
+#else
+#define VGA_MEMORY (0xA0000)
+#endif
+
 #include "eui.h"
 
-#define VGA_MEMORY (0xA0000)
 static uint8_t backbuffer[320 * 200];
 static bool running;
 
 /* button callback */
 void quit_callback(void *user)
 {
+	EUI_UNUSED(user);
 	running = false;
 }
 
@@ -56,6 +66,9 @@ int main(int argc, char **argv)
 	eui_event_t event;
 	union REGS regs;
 	eui_vec2_t pos, size;
+
+	EUI_UNUSED(argc);
+	EUI_UNUSED(argv);
 
 	/* get old mode */
 	regs.h.ah = 0x0f;
@@ -115,7 +128,7 @@ int main(int argc, char **argv)
 		}
 
 		/* do eui */
-		if (eui_begin(dest));
+		if (eui_begin(dest))
 		{
 			/* clear */
 			eui_clear(18);

@@ -9,10 +9,10 @@ SYS=dos32x
 CFLAGS=-DEUI_PIXEL_DEPTH=8 -bt=$(SYS)
 
 # executable name
-TARGET=test_watcom.exe
+TARGET=test_watcom32.exe
 
 # objects
-OBJECTS=test_watcom.obj eui.obj
+OBJECTS=test_dos32.obj eui.obj
 
 # clean and build executable
 all: clean $(TARGET)

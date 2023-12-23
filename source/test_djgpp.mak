@@ -12,7 +12,7 @@ override CFLAGS += -pedantic -Wall -Wextra -DEUI_PIXEL_DEPTH=8
 EXEC ?= test_djgpp.exe
 
 # objects
-OBJECTS = test_djgpp.o eui.o
+OBJECTS = test_dos32.o eui.o
 
 # clean and build execs
 all: clean $(EXEC)
