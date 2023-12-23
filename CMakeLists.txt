@@ -18,7 +18,7 @@ add_executable(test_basic
 target_compile_definitions(test_basic PUBLIC EUI_PIXEL_DEPTH=8)
 
 # dos32 test
-if(${CMAKE_SYSTEM_NAME} STREQUAL DOS)
+if(${CMAKE_SYSTEM_NAME} STREQUAL DOS AND NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL I86)
 	add_executable(test_dos32
 		${PROJECT_SOURCE_DIR}/source/test_dos32.c
 		${PROJECT_SOURCE_DIR}/source/eui.c)
