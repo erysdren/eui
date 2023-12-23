@@ -1,4 +1,8 @@
 /**/untracked*/
 *.o
+*.obj
+*.err
+*.com
 *.exe
+*.swp
 /source/test_sdl2
