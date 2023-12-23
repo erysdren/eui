@@ -30,7 +30,6 @@ SOFTWARE.
 extern "C" {
 #endif
 
-#include <stdbool.h>
 #include <stdint.h>
 
 /* element alignment */
@@ -234,8 +233,8 @@ void eui_transform_point(eui_vec2_t *pos);
 /* transform box to current frame, with alignment */
 void eui_transform_box(eui_vec2_t *pos, eui_vec2_t size);
 
-/* clip box to screen size, returns false if the shape will never be visible */
-bool eui_clip_box(eui_vec2_t *pos, eui_vec2_t *size);
+/* clip box to screen size, returns EUI_FALSE if the shape will never be visible */
+int eui_clip_box(eui_vec2_t *pos, eui_vec2_t *size);
 
 /*
  *
@@ -280,7 +279,7 @@ int eui_pop_key(void);
  */
 
 /* begin eui with given pixelmap destination */
-bool eui_begin(eui_pixelmap_t dest);
+int eui_begin(eui_pixelmap_t dest);
 
 /* end eui */
 void eui_end(void);
@@ -303,8 +302,8 @@ eui_config_t *eui_get_config(void);
 /* get dimensions of text string, with newlines */
 eui_vec2_t eui_get_text_size(char *s);
 
-/* returns true if the mouse cursor is hovering over the given area */
-bool eui_is_hovered(eui_vec2_t pos, eui_vec2_t size);
+/* returns EUI_TRUE if the mouse cursor is hovering over the given area */
+int eui_is_hovered(eui_vec2_t pos, eui_vec2_t size);
 
 /* clear screen with color */
 void eui_clear(eui_color_t color);
@@ -348,11 +347,11 @@ void eui_xbm(eui_vec2_t pos, eui_color_t color, int w, int h, unsigned char *bit
  *
  */
 
-/* fires callback function if pressed and returns true if hovered */
-bool eui_button(eui_vec2_t pos, eui_vec2_t size, char *text, eui_callback callback, void *user);
+/* fires callback function if pressed and returns EUI_TRUE if hovered */
+int eui_button(eui_vec2_t pos, eui_vec2_t size, char *text, eui_callback callback, void *user);
 
-/* bool checkbox */
-void eui_checkbox(eui_vec2_t pos, char *label, eui_color_t color, bool *value);
+/* on/off checkbox */
+void eui_checkbox(eui_vec2_t pos, char *label, eui_color_t color, int *value);
 
 #ifdef __cplusplus
 }

@@ -29,7 +29,6 @@ SOFTWARE.
  *
  */
 
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -252,7 +251,7 @@ static int button = 0;
 #define MAX_KEYS (256)
 #define KEY_BUFFER_SIZE (64)
 #define KEY_BUFFER_ADVANCE(x) ((x) = ((x) + 1) & (KEY_BUFFER_SIZE - 1))
-static bool keys[MAX_KEYS] = {0};
+static char keys[MAX_KEYS] = {0};
 static int key_buffer[KEY_BUFFER_SIZE] = {0};
 static int key_buffer_ridx = 0;
 static int key_buffer_widx = 0;
@@ -380,18 +379,18 @@ void eui_transform_box(eui_vec2_t *pos, eui_vec2_t size)
 	}
 }
 
-/* clip box to screen size, returns false if the shape will never be visible */
-bool eui_clip_box(eui_vec2_t *pos, eui_vec2_t *size)
+/* clip box to screen size, returns 0 if the shape will never be visible */
+int eui_clip_box(eui_vec2_t *pos, eui_vec2_t *size)
 {
 	/* it will never become visible */
 	if (pos->x >= drawdest.w)
-		return false;
+		return EUI_FALSE;
 	if (pos->y >= drawdest.h)
-		return false;
+		return EUI_FALSE;
 	if (pos->x + size->x < 0)
-		return false;
+		return EUI_FALSE;
 	if (pos->y + size->y < 0)
-		return false;
+		return EUI_FALSE;
 
 	/* clip to top edge */
 	if (pos->y < 0)
@@ -419,7 +418,7 @@ bool eui_clip_box(eui_vec2_t *pos, eui_vec2_t *size)
 		size->x = drawdest.w - pos->x;
 	}
 
-	return true;
+	return EUI_TRUE;
 }
 
 /*
@@ -530,14 +529,14 @@ static void eui_reset_key(void)
  */
 
 /* begin eui with given pixelmap destination */
-bool eui_begin(eui_pixelmap_t dest)
+int eui_begin(eui_pixelmap_t dest)
 {
 	eui_event_t event;
 	eui_vec2_t pos, size;
 
 	/* sanity check */
 	if (!dest.w || !dest.h || !dest.pitch || !dest.pixels)
-		return false;
+		return EUI_FALSE;
 
 	/* set draw destination */
 	drawdest = dest;
@@ -551,12 +550,12 @@ bool eui_begin(eui_pixelmap_t dest)
 		switch (event.type)
 		{
 			case EUI_EVENT_KEY_DOWN:
-				keys[event.key.scancode] = true;
+				keys[event.key.scancode] = EUI_TRUE;
 				eui_push_key(event.key.scancode);
 				break;
 
 			case EUI_EVENT_KEY_UP:
-				keys[event.key.scancode] = false;
+				keys[event.key.scancode] = EUI_FALSE;
 				break;
 
 			case EUI_EVENT_MOUSE:
@@ -584,7 +583,7 @@ bool eui_begin(eui_pixelmap_t dest)
 	size.y = drawdest.h;
 	eui_push_frame(pos, size);
 
-	return true;
+	return EUI_TRUE;
 }
 
 /* end eui */
@@ -643,16 +642,16 @@ eui_vec2_t eui_get_text_size(char *s)
 	return size;
 }
 
-/* returns true if the mouse cursor is hovering over the given area */
-bool eui_is_hovered(eui_vec2_t pos, eui_vec2_t size)
+/* returns EUI_TRUE if the mouse cursor is hovering over the given area */
+int eui_is_hovered(eui_vec2_t pos, eui_vec2_t size)
 {
 	eui_transform_box(&pos, size);
 
 	if (mouse.x < pos.x || mouse.x > pos.x + size.x)
-		return false;
+		return EUI_FALSE;
 	if (mouse.y < pos.y || mouse.y > pos.y + size.y)
-		return false;
-	return true;
+		return EUI_FALSE;
+	return EUI_TRUE;
 }
 
 /* clear screen with color */
@@ -1061,11 +1060,11 @@ void eui_xbm(eui_vec2_t pos, eui_color_t color, int w, int h, unsigned char *bit
  *
  */
 
-/* fires callback function if pressed and returns true if hovered */
-bool eui_button(eui_vec2_t pos, eui_vec2_t size, char *text, eui_callback callback, void *user)
+/* fires callback function if pressed and returns EUI_TRUE if hovered */
+int eui_button(eui_vec2_t pos, eui_vec2_t size, char *text, eui_callback callback, void *user)
 {
-	static bool clicked;
-	bool hovered;
+	static int clicked;
+	int hovered;
 	eui_vec2_t zeropos;
 
 	hovered = eui_is_hovered(pos, size);
@@ -1095,20 +1094,20 @@ bool eui_button(eui_vec2_t pos, eui_vec2_t size, char *text, eui_callback callba
 	if (hovered && button && !clicked)
 	{
 		callback(user);
-		clicked = true;
+		clicked = EUI_TRUE;
 	}
 
 	if (!button)
-		clicked = false;
+		clicked = EUI_FALSE;
 
 	return hovered;
 }
 
-/* bool checkbox */
-void eui_checkbox(eui_vec2_t pos, char *label, eui_color_t color, bool *value)
+/* on/off checkbox */
+void eui_checkbox(eui_vec2_t pos, char *label, eui_color_t color, int *value)
 {
-	static bool clicked;
-	bool hovered;
+	static int clicked;
+	int hovered;
 	eui_vec2_t size;
 
 	if (!value)
@@ -1124,10 +1123,10 @@ void eui_checkbox(eui_vec2_t pos, char *label, eui_color_t color, bool *value)
 	if (hovered && button && !clicked)
 	{
 		*value = !*value;
-		clicked = true;
+		clicked = EUI_TRUE;
 	}
 	if (!button)
-		clicked = false;
+		clicked = EUI_FALSE;
 
 	/* draw x */
 	if (*value)

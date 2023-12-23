@@ -29,7 +29,6 @@ SOFTWARE.
  *
  */
 
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -135,12 +134,12 @@ static void initialize_scancode_table(void)
 }
 
 /* begin eui with given SDL_Surface destination */
-bool eui_begin_sdl2(SDL_Surface *surface)
+int eui_begin_sdl2(SDL_Surface *surface)
 {
 	eui_pixelmap_t dest;
 
 	if (sizeof(eui_color_t) != surface->format->BytesPerPixel)
-		return false;
+		return EUI_FALSE;
 
 	dest.w = surface->w;
 	dest.h = surface->h;

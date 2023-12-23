@@ -34,7 +34,7 @@ extern "C" {
 #include "SDL.h"
 
 /* begin eui with given SDL_Surface destination */
-bool eui_begin_sdl2(SDL_Surface *surface);
+int eui_begin_sdl2(SDL_Surface *surface);
 
 /* process and push SDL2 event */
 void eui_push_event_sdl2(SDL_Event *event);
