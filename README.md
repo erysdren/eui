@@ -18,7 +18,8 @@ The main EUI library is only two files, [`eui.c`](./source/eui.c) and [`eui.h`](
 ## Credits
 
 - EUI uses [Daniel Hepper's font8x8](https://github.com/dhepper/font8x8/) (License: Public Domain).
-- EUI uses code ported from [Shpuld's SUI](https://github.com/shpuld/sui-qc/) (License: MIT).
+- EUI uses code from [Shpuld's SUI](https://github.com/shpuld/sui-qc/) (License: MIT).
+- EUI uses code from [Ada's Danelaw](https://thingvellir.net/git/danelaw/) (License: CC0 1.0).
 
 ## License
 
