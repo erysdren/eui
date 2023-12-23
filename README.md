@@ -7,6 +7,8 @@ EUI is a small UI and drawing library designed for homebrew games, debug UIs, em
 
 The main EUI library is only two files, [`eui.c`](./source/eui.c) and [`eui.h`](./source/eui.h). To add EUI to your project, just clone the files into your source tree and compile.
 
+You must also define the `EUI_PIXEL_DEPTH` preprocessor macro. Valid values: 8, 16, 32.
+
 > [!WARNING]
 > EUI is *not* yet production-ready, and the API is still changing. Proceed with caution.
 
