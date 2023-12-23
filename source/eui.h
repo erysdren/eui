@@ -157,7 +157,7 @@ enum {
 
 /* default pixel depth is 8bpp */
 #ifndef EUI_PIXEL_DEPTH
-#define EUI_PIXEL_DEPTH (8)
+#error Please define EUI_PIXEL_DEPTH! Valid values: 8, 16, 32
 #endif
 
 /* pixel color type */

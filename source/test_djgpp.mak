@@ -6,7 +6,7 @@ AS = i586-pc-msdosdjgpp-as
 RM ?= rm -f
 
 # base cflags
-override CFLAGS += -pedantic -Wall -Wextra
+override CFLAGS += -pedantic -Wall -Wextra -DEUI_PIXEL_DEPTH=8
 
 # executable name
 EXEC ?= test_djgpp.exe

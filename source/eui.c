@@ -252,10 +252,19 @@ static int key_buffer_widx = 0;
 #if (EUI_PIXEL_DEPTH == 8)
 /* assumes vga palette */
 static eui_config_t config = {
-	{0, 15, 15, 0, 0, 15, 1} /* button */
+	/* button */
+	{0, 15, 15, 0, 0, 15, 1}
 };
-#else
-static eui_config_t config = {0};
+#elif (EUI_PIXEL_DEPTH == 16)
+static eui_config_t config = {
+	/* button */
+	{0x0000, 0xFFFF, 0xFFFF, 0x0000, 0x0000, 0xFFFF, 1}
+};
+#elif (EUI_PIXEL_DEPTH == 32)
+static eui_config_t config = {
+	/* button */
+	{0x00000000, 0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0x00000000, 0xFFFFFFFF, 1}
+};
 #endif
 
 /*
