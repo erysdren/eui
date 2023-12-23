@@ -661,8 +661,8 @@ void eui_cursor(eui_color_t color)
  *
  */
 
-/* draw filled box at box, clipped but not transformed */
-static void eui_filled_box_clipped(eui_vec2_t pos, eui_vec2_t size, eui_color_t color)
+/* draw filled box at pos, clipped but not transformed */
+static void eui_filled_box_absolute(eui_vec2_t pos, eui_vec2_t size, eui_color_t color)
 {
 	if (!eui_clip_box(&pos, &size))
 		return;
@@ -678,7 +678,7 @@ void eui_filled_box(eui_vec2_t pos, eui_vec2_t size, eui_color_t color)
 {
 	eui_transform_box(&pos, size);
 
-	eui_filled_box_clipped(pos, size, color);
+	eui_filled_box_absolute(pos, size, color);
 }
 
 /* draw hollow box at pos, transformed */
@@ -687,16 +687,16 @@ void eui_border_box(eui_vec2_t pos, eui_vec2_t size, int width, eui_color_t colo
 	eui_transform_box(&pos, size);
 
 	/* top line */
-	eui_filled_box_clipped(pos, EUI_VEC2(size.x, width), color);
+	eui_filled_box_absolute(pos, EUI_VEC2(size.x, width), color);
 
 	/* bottom line */
-	eui_filled_box_clipped(EUI_VEC2(pos.x, pos.y + size.y - width), EUI_VEC2(size.x, width), color);
+	eui_filled_box_absolute(EUI_VEC2(pos.x, pos.y + size.y - width), EUI_VEC2(size.x, width), color);
 
 	/* left line */
-	eui_filled_box_clipped(EUI_VEC2(pos.x, pos.y + width), EUI_VEC2(width, size.y - width * 2), color);
+	eui_filled_box_absolute(EUI_VEC2(pos.x, pos.y + width), EUI_VEC2(width, size.y - width * 2), color);
 
 	/* right line */
-	eui_filled_box_clipped(EUI_VEC2(pos.x + size.x - width, pos.y + width), EUI_VEC2(width, size.y - width * 2), color);
+	eui_filled_box_absolute(EUI_VEC2(pos.x + size.x - width, pos.y + width), EUI_VEC2(width, size.y - width * 2), color);
 }
 
 /* draw text at pos, transformed */
