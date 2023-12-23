@@ -5,8 +5,8 @@ EUI is a small UI and drawing library designed for homebrew games, debug UIs, em
 
 ## Source Code Guide
 
-- `eui.c` & `eui.h`: Main platform agnostic EUI library.
-- `eui_sdl2.c` & `eui_sdl2.h`: Helper functions for integration with SDL2.
+- [`eui.c`](./source/eui.c) & [`eui.h`](./source/eui.h): Main platform agnostic EUI library.
+- [`eui_sdl2.c`](./source/eui_sdl2.c) & [`eui_sdl2.h`](./source/eui_sdl2.h): Helper functions for integration with SDL2.
 
 ## Credits
 
