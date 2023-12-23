@@ -84,6 +84,7 @@ int main(int argc, char **argv)
 	unsigned int rmask, gmask, bmask, amask;
 	int bpp;
 	eui_config_t *eui_config;
+	eui_vec2_t pos, size;
 
 	EUI_UNUSED(argc);
 	EUI_UNUSED(argv);
@@ -172,18 +173,26 @@ int main(int argc, char **argv)
 			eui_clear(15);
 
 			/* border */
-			eui_border_box(EUI_VEC2(0, 0), EUI_VEC2(WIDTH, HEIGHT), 2, 0);
+			pos.x = 0;
+			pos.y = 0;
+			size.x = WIDTH;
+			size.y = HEIGHT;
+			eui_border_box(pos, size, 2, 0);
 
 			/* title */
-			eui_border_box(EUI_VEC2(0, 0), EUI_VEC2(WIDTH, 18), 2, 0);
-			eui_push_frame(EUI_VEC2(0, 0), EUI_VEC2(WIDTH, 18));
+			size.x = WIDTH;
+			size.y = 18;
+			eui_border_box(pos, size, 2, 0);
+			eui_push_frame(pos, size);
 			eui_set_align(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
-			eui_text(EUI_VEC2(0, 0), 0, "eui");
+			eui_text(pos, 0, "eui");
 			eui_pop_frame();
 
 			/* quit button */
+			size.x = 48;
+			size.y = 16;
 			eui_set_align(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
-			eui_button(EUI_VEC2(0, 0), EUI_VEC2(48, 16), "Quit", quit_callback, NULL);
+			eui_button(pos, size, "Quit", quit_callback, NULL);
 
 			/* end eui */
 			eui_end();

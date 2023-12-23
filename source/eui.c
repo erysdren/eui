@@ -798,7 +798,7 @@ void eui_textf(eui_vec2_t pos, eui_color_t color, char *s, ...)
 	va_list args;
 
 	va_start(args, s);
-	vsnprintf(text, sizeof(text), s, args);
+	vsprintf(text, s, args);
 	va_end(args);
 
 	eui_text(pos, color, text);
