@@ -5,4 +5,6 @@
 *.com
 *.exe
 *.swp
+*.SWP
 /source/test_sdl2
+/source/dosbox-x.*
