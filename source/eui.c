@@ -212,6 +212,15 @@ typedef struct frame_t {
 
 /*
  *
+ * limits
+ *
+ */
+
+#define MAX_WIDTH (2048)
+#define MAX_HEIGHT (2048)
+
+/*
+ *
  * local variables
  *
  */
@@ -475,12 +484,11 @@ int eui_pop_event(eui_event_t *out)
 {
 	if (!num_events)
 	{
-		*out = (eui_event_t){0};
 		return 0;
 	}
 
 	*out = events[num_events];
-	events[num_events] = (eui_event_t){0};
+	memset(&events[num_events], 0, sizeof(eui_event_t));
 	num_events--;
 
 	return num_events + 1;
@@ -525,6 +533,7 @@ static void eui_reset_key(void)
 bool eui_begin(eui_pixelmap_t dest)
 {
 	eui_event_t event;
+	eui_vec2_t pos, size;
 
 	/* sanity check */
 	if (!dest.w || !dest.h || !dest.pitch || !dest.pixels)
@@ -569,7 +578,11 @@ bool eui_begin(eui_pixelmap_t dest)
 	eui_reset_frame();
 
 	/* push screen frame */
-	eui_push_frame(EUI_VEC2(0, 0), EUI_VEC2(drawdest.w, drawdest.h));
+	pos.x = 0;
+	pos.y = 0;
+	size.x = drawdest.w;
+	size.y = drawdest.h;
+	eui_push_frame(pos, size);
 
 	return true;
 }
@@ -651,7 +664,10 @@ void eui_clear(eui_color_t color)
 /* draw built-in cursor */
 void eui_cursor(eui_color_t color)
 {
-	eui_font8x8(EUI_VEC2(mouse.x - 3, mouse.y - 3), font8x8_basic['x'], color);
+	eui_vec2_t pos;
+	pos.x = mouse.x - 3;
+	pos.y = mouse.y - 3;
+	eui_font8x8(pos, font8x8_basic['x'], color);
 }
 
 /*
@@ -685,19 +701,36 @@ void eui_filled_box(eui_vec2_t pos, eui_vec2_t size, eui_color_t color)
 /* draw hollow box at pos, transformed */
 void eui_border_box(eui_vec2_t pos, eui_vec2_t size, int width, eui_color_t color)
 {
+	eui_vec2_t lpos, lsize;
 	eui_transform_box(&pos, size);
 
 	/* top line */
-	eui_filled_box_absolute(pos, EUI_VEC2(size.x, width), color);
+	lpos.x = pos.x;
+	lpos.y = pos.y;
+	lsize.x = size.x;
+	lsize.y = width;
+	eui_filled_box_absolute(lpos, lsize, color);
 
 	/* bottom line */
-	eui_filled_box_absolute(EUI_VEC2(pos.x, pos.y + size.y - width), EUI_VEC2(size.x, width), color);
+	lpos.x = pos.x;
+	lpos.y = pos.y + size.y - width;
+	lsize.x = size.x;
+	lsize.y = width;
+	eui_filled_box_absolute(lpos, lsize, color);
 
 	/* left line */
-	eui_filled_box_absolute(EUI_VEC2(pos.x, pos.y + width), EUI_VEC2(width, size.y - width * 2), color);
+	lpos.x = pos.x;
+	lpos.y = pos.y + width;
+	lsize.x = width;
+	lsize.y = size.y - width * 2;
+	eui_filled_box_absolute(lpos, lsize, color);
 
 	/* right line */
-	eui_filled_box_absolute(EUI_VEC2(pos.x + size.x - width, pos.y + width), EUI_VEC2(width, size.y - width * 2), color);
+	lpos.x = pos.x + size.x - width;
+	lpos.y = pos.y + width;
+	lsize.x = width;
+	lsize.y = size.y - width * 2;
+	eui_filled_box_absolute(lpos, lsize, color);
 }
 
 /* draw text at pos, transformed */
@@ -772,7 +805,7 @@ void eui_textf(eui_vec2_t pos, eui_color_t color, char *s, ...)
 }
 
 /* scan triangle edge and add to edge table */
-static void eui_triangle_scan_edge(eui_vec2_t p0, eui_vec2_t p1, int edge_table[drawdest.h][2])
+static void eui_triangle_scan_edge(eui_vec2_t p0, eui_vec2_t p1, int edge_table[MAX_HEIGHT][2])
 {
 	int sx, sy, dx1, dy1, dx2, dy2, x, y, m, n, k, cnt;
 
@@ -841,7 +874,7 @@ static void eui_triangle_scan_edge(eui_vec2_t p0, eui_vec2_t p1, int edge_table[
 void eui_filled_triangle(eui_vec2_t p0, eui_vec2_t p1, eui_vec2_t p2, eui_color_t color)
 {
 	int x, y, len;
-	int edge_table[drawdest.h][2];
+	static int edge_table[MAX_HEIGHT][2];
 
 	/* init edge table */
 	for (y = 0; y < drawdest.h; y++)
@@ -961,7 +994,8 @@ void eui_pixelmap(eui_vec2_t pos, eui_pixelmap_t pixelmap)
 	eui_vec2_t ofs;
 
 	/* transform */
-	size = EUI_VEC2(pixelmap.w, pixelmap.h);
+	size.x = pixelmap.w;
+	size.y = pixelmap.h;
 	eui_transform_box(&pos, size);
 
 	/* save current pos */
@@ -994,9 +1028,12 @@ void eui_xbm(eui_vec2_t pos, eui_color_t color, int w, int h, unsigned char *bit
 {
 	int x, y, xx, yy;
 	int pitch;
+	eui_vec2_t size;
 
 	/* transform */
-	eui_transform_box(&pos, EUI_VEC2(w, h));
+	size.x = w;
+	size.y = h;
+	eui_transform_box(&pos, size);
 
 	/* draw graphic */
 	pitch = w + (8 % w) - (w % 8);
@@ -1029,8 +1066,12 @@ bool eui_button(eui_vec2_t pos, eui_vec2_t size, char *text, eui_callback callba
 {
 	static bool clicked;
 	bool hovered;
+	eui_vec2_t zeropos;
 
 	hovered = eui_is_hovered(pos, size);
+
+	zeropos.x = 0;
+	zeropos.y = 0;
 
 	if (hovered)
 	{
@@ -1038,7 +1079,7 @@ bool eui_button(eui_vec2_t pos, eui_vec2_t size, char *text, eui_callback callba
 		eui_border_box(pos, size, config.button.border_width, config.button.border_color_hover);
 		eui_push_frame(pos, size);
 		eui_set_align(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
-		eui_text(EUI_VEC2(0, 0), config.button.text_color_hover, text);
+		eui_text(zeropos, config.button.text_color_hover, text);
 		eui_pop_frame();
 	}
 	else
@@ -1047,7 +1088,7 @@ bool eui_button(eui_vec2_t pos, eui_vec2_t size, char *text, eui_callback callba
 		eui_border_box(pos, size, config.button.border_width, config.button.border_color);
 		eui_push_frame(pos, size);
 		eui_set_align(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
-		eui_text(EUI_VEC2(0, 0), config.button.text_color, text);
+		eui_text(zeropos, config.button.text_color, text);
 		eui_pop_frame();
 	}
 
@@ -1074,7 +1115,8 @@ void eui_checkbox(eui_vec2_t pos, char *label, eui_color_t color, bool *value)
 		return;
 
 	/* box border */
-	size = EUI_VEC2(11, 11);
+	size.x = 11;
+	size.y = 11;
 	eui_xbm(pos, color, checkbox_border_w, checkbox_border_h, checkbox_border_bits);
 
 	/* toggle on click */
@@ -1092,5 +1134,7 @@ void eui_checkbox(eui_vec2_t pos, char *label, eui_color_t color, bool *value)
 		eui_xbm(pos, color, checkbox_x_w, checkbox_x_h, checkbox_x_bits);
 
 	/* label */
-	eui_text(EUI_VEC2(pos.x + 13, pos.y + 2), color, label);
+	pos.x += 13;
+	pos.y += 2;
+	eui_text(pos, color, label);
 }
