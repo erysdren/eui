@@ -25,7 +25,7 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL DOS)
 	target_compile_definitions(test_dos32 PUBLIC EUI_PIXEL_DEPTH=8)
 endif()
 
-# sdl2 examples
+# sdl2 tests
 find_package(SDL2)
 if(SDL2_FOUND)
 	add_executable(test_sdl2_01
