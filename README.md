@@ -17,6 +17,12 @@ You must also define the `EUI_PIXEL_DEPTH` preprocessor macro. Valid values: 8, 
 - [`eui.c`](./source/eui.c) & [`eui.h`](./source/eui.h): Main platform agnostic EUI library.
 - [`eui_sdl2.c`](./source/eui_sdl2.c) & [`eui_sdl2.h`](./source/eui_sdl2.h): Helper functions for integration with SDL2.
 
+## Tested Compilers & Platforms
+
+- GCC (Linux, DOS)
+- Clang (Linux)
+- Watcom (DOS)
+
 ## Credits
 
 - [Shpuld's SUI](https://github.com/shpuld/sui-qc/) (License: MIT)
