@@ -1,5 +1,4 @@
 /*
-/*
 MIT License
 
 Copyright (c) 2018 shpuld
@@ -26,7 +25,7 @@ SOFTWARE.
 
 /*
  *
- * TEST_SDL2.C
+ * TEST_DJGPP.C
  *
  */
 
