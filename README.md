@@ -9,6 +9,8 @@ The main EUI library is only two files, [`eui.c`](./source/eui.c) and [`eui.h`](
 
 You must also define the `EUI_PIXEL_DEPTH` preprocessor macro. Valid values: 8, 16, 32.
 
+While CMake is used to build the test programs, it is not required for EUI itself.
+
 > [!WARNING]
 > EUI is *not* yet production-ready, and the API is still changing. Proceed with caution.
 
@@ -26,9 +28,10 @@ You must also define the `EUI_PIXEL_DEPTH` preprocessor macro. Valid values: 8, 
 
 ## Credits
 
-- [Shpuld's SUI](https://github.com/shpuld/sui-qc/) (License: MIT)
-- [Daniel Hepper's font8x8](https://github.com/dhepper/font8x8/) (License: Public Domain)
-- [Ada's Danelaw](https://thingvellir.net/git/danelaw/) (License: CC0 1.0)
+- [SUI](https://github.com/shpuld/sui-qc/) (License: MIT)
+- [font8x8](https://github.com/dhepper/font8x8/) (License: Public Domain)
+- [Danelaw](https://thingvellir.net/git/danelaw/) (License: CC0 1.0)
+- [SDL2 CMake modules](https://github.com/aminosbh/sdl2-cmake-modules) (License: BSD-3)
 
 ## License
 

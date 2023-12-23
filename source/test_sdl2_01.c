@@ -112,7 +112,7 @@ int main(int argc, char **argv)
 	SDL_FillRect(surface8, NULL, 0);
 
 	/* install palette */
-	install_palette("pal_vga.dat", surface8);
+	install_palette("vga.pal", surface8);
 
 	/* create display surface */
 	format = SDL_GetWindowPixelFormat(window);
