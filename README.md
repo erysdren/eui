@@ -33,8 +33,6 @@ You must also define the `EUI_PIXEL_DEPTH` preprocessor macro. Valid values: 8, 
 
 MIT License
 
-Copyright (c) 2018 shpuld
-
 Copyright (c) 2023 erysdren (it/she/they)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
