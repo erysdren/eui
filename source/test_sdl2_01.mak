@@ -5,7 +5,7 @@ RM ?= rm -f
 PKGCONFIG ?= pkg-config
 
 # base cflags and ldflags
-override CFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags)
+override CFLAGS += -std=c99 -pedantic -Wall -Wextra $(shell $(PKGCONFIG) sdl2 --cflags)
 override LDFLAGS += $(shell $(PKGCONFIG) sdl2 --libs)
 
 # executable name

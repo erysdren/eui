@@ -49,6 +49,7 @@ static SDL_Event event;
 
 void my_cool_button_callback(void *user)
 {
+	EUI_UNUSED(user);
 	printf("My cool button was pressed!\n");
 }
 
@@ -81,6 +82,9 @@ int main(int argc, char **argv)
 	uint32_t format;
 	unsigned int rmask, gmask, bmask, amask;
 	int bpp;
+
+	EUI_UNUSED(argc);
+	EUI_UNUSED(argv);
 
 	/* init */
 	SDL_Init(SDL_INIT_VIDEO);
@@ -143,7 +147,7 @@ int main(int argc, char **argv)
 		}
 
 		/* do eui */
-		if (eui_begin_sdl2(surface8));
+		if (eui_begin_sdl2(surface8))
 		{
 			/* clear */
 			eui_clear(18);

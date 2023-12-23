@@ -51,6 +51,7 @@ static bool running;
 /* button callback */
 void quit_callback(void *user)
 {
+	EUI_UNUSED(user);
 	running = false;
 }
 
@@ -61,6 +62,9 @@ int main(int argc, char **argv)
 	eui_pixelmap_t dest;
 	eui_event_t event;
 	union REGS regs;
+
+	EUI_UNUSED(argc);
+	EUI_UNUSED(argv);
 
 	/* get old mode */
 	regs.h.ah = 0x0f;
@@ -120,7 +124,7 @@ int main(int argc, char **argv)
 		}
 
 		/* do eui */
-		if (eui_begin(dest));
+		if (eui_begin(dest))
 		{
 			/* clear */
 			eui_clear(18);

@@ -201,6 +201,8 @@ typedef void eui_callback(void *user);
  *
  */
 
+#define EUI_UNUSED(x) ((void)(x))
+
 /* create vec2 */
 #define EUI_VEC2(x, y) (eui_vec2_t){(x), (y)}
 
@@ -251,6 +253,12 @@ void eui_push_event(eui_event_t event);
 
 /* pop event from the top of the queue */
 int eui_pop_event(eui_event_t *out);
+
+/* push key to the queue */
+void eui_push_key(int scancode);
+
+/* pop key from the top of the queue */
+int eui_pop_key(void);
 
 /*
  *
@@ -310,7 +318,7 @@ void eui_line(eui_vec2_t p0, eui_vec2_t p1, eui_color_t color);
 void eui_pixelmap(eui_vec2_t pos, eui_pixelmap_t pixelmap);
 
 /* draw xbm graphic, transformed */
-void eui_xbm(eui_vec2_t pos, eui_color_t color, int w, int h, char *bits);
+void eui_xbm(eui_vec2_t pos, eui_color_t color, int w, int h, unsigned char *bits);
 
 /*
  *

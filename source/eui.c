@@ -184,7 +184,7 @@ static const unsigned char font8x8_basic[128][8] = {
 /* checkbox border */
 static const int checkbox_border_w = 11;
 static const int checkbox_border_h = 11;
-static char checkbox_border_bits[] = {
+static unsigned char checkbox_border_bits[] = {
 	0xff, 0x07, 0x01, 0x04, 0x01, 0x04, 0x01, 0x04, 0x01, 0x04, 0x01, 0x04,
 	0x01, 0x04, 0x01, 0x04, 0x01, 0x04, 0x01, 0x04, 0xff, 0x07
 };
@@ -192,41 +192,9 @@ static char checkbox_border_bits[] = {
 /* checkbox x */
 static const int checkbox_x_w = 11;
 static const int checkbox_x_h = 11;
-static char checkbox_x_bits[] = {
+static unsigned char checkbox_x_bits[] = {
 	0x00, 0x00, 0x00, 0x00, 0x04, 0x01, 0x88, 0x00, 0x50, 0x00, 0x20, 0x00,
 	0x50, 0x00, 0x88, 0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00
-};
-
-/*
- *
- * tables
- *
- */
-
-static const int eui_scan_to_ascii[128] = {
-	0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
-	'\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',
-	0, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`',
-	0, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 0,
-	0, 0, ' ', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
-
-static const int eui_scan_to_ascii_shifted[128] = {
-	0, 0, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b',
-	'\t', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n',
-	0, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', '~',
-	0, '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', 0,
-	0, 0, ' ', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 /*
@@ -488,19 +456,19 @@ int eui_pop_event(eui_event_t *out)
 {
 	if (!num_events)
 	{
-		*out = (eui_event_t){};
+		*out = (eui_event_t){0};
 		return 0;
 	}
 
 	*out = events[num_events];
-	events[num_events] = (eui_event_t){};
+	events[num_events] = (eui_event_t){0};
 	num_events--;
 
 	return num_events + 1;
 }
 
 /* push key to the queue */
-static void eui_push_key(int scancode)
+void eui_push_key(int scancode)
 {
 	key_buffer[key_buffer_widx] = scancode;
 	KEY_BUFFER_ADVANCE(key_buffer_widx);
@@ -509,7 +477,7 @@ static void eui_push_key(int scancode)
 }
 
 /* pop key from the top of the queue */
-static int eui_pop_key(void)
+int eui_pop_key(void)
 {
 	int res = -1;
 
@@ -955,7 +923,7 @@ void eui_line(eui_vec2_t p0, eui_vec2_t p1, eui_color_t color)
 /* draw pixelmap, transformed */
 void eui_pixelmap(eui_vec2_t pos, eui_pixelmap_t pixelmap)
 {
-	int x, y, xx, yy;
+	int y, yy;
 	eui_vec2_t size;
 	eui_vec2_t ofs;
 
@@ -983,14 +951,13 @@ void eui_pixelmap(eui_vec2_t pos, eui_pixelmap_t pixelmap)
 	/* draw */
 	for (y = ofs.y; y < size.y; y++)
 	{
-		xx = pos.x;
 		yy = pos.y + y - ofs.y;
-		memcpy(&PIXEL(drawdest, xx, yy), &PIXEL(pixelmap, ofs.x, y), size.x);
+		memcpy(&PIXEL(drawdest, pos.x, yy), &PIXEL(pixelmap, ofs.x, y), size.x);
 	}
 }
 
 /* draw xbm graphic, transformed */
-void eui_xbm(eui_vec2_t pos, eui_color_t color, int w, int h, char *bitmap)
+void eui_xbm(eui_vec2_t pos, eui_color_t color, int w, int h, unsigned char *bitmap)
 {
 	int x, y, xx, yy;
 	int pitch;

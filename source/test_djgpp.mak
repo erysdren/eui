@@ -5,6 +5,9 @@ LD = i586-pc-msdosdjgpp-ld
 AS = i586-pc-msdosdjgpp-as
 RM ?= rm -f
 
+# base cflags
+override CFLAGS += -pedantic -Wall -Wextra
+
 # executable name
 EXEC ?= test_djgpp.exe
 
