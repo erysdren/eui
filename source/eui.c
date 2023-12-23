@@ -249,7 +249,14 @@ static int key_buffer_ridx = 0;
 static int key_buffer_widx = 0;
 
 /* configuration state */
+#if (EUI_PIXEL_DEPTH == 8)
+/* assumes vga palette */
+static eui_config_t config = {
+	{0, 15, 15, 0, 0, 15, 1} /* button */
+};
+#else
 static eui_config_t config = {0};
+#endif
 
 /*
  *
