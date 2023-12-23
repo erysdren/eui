@@ -1,4 +1,6 @@
 
+![EUI Example](./.github/eui.png "EUI Example")
+
 # EUI
 
 EUI is a small UI and drawing library designed for homebrew games, debug UIs, embedded systems, and low resolution or low color depth displays.
