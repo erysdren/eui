@@ -537,6 +537,8 @@ int eui_begin(eui_pixelmap_t dest)
 	/* sanity check */
 	if (!dest.w || !dest.h || !dest.pitch || !dest.pixels)
 		return EUI_FALSE;
+	if (dest.w >= MAX_WIDTH || dest.h >= MAX_HEIGHT)
+		return EUI_FALSE;
 
 	/* set draw destination */
 	drawdest = dest;
