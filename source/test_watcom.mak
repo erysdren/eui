@@ -1,30 +1,36 @@
 
 # static variables
-CC = wcl386
-LD = wlink
-RM ?= rm -f
+CC=wcc386
+LD=wlink
+RM=rm -f
 
-# base cflags and ldflags
-override CFLAGS += -DEUI_PIXEL_DEPTH=8 -bt=dos4g
-override LDFLAGS += sys dos32x
+# base system and cflags
+SYS=dos32x
+CFLAGS=-DEUI_PIXEL_DEPTH=8 -bt=$(SYS)
 
 # executable name
-EXEC ?= test_watcom.exe
+TARGET=test_watcom.exe
 
 # objects
-OBJECTS = test_watcom.obj eui.obj
+OBJECTS=test_watcom.obj eui.obj
 
-# clean and build execs
-all: clean $(EXEC)
+# clean and build executable
+all: clean $(TARGET)
 
 # remove objects and executable
-clean:
-	$(RM) $(OBJECTS) $(EXEC)
+clean: .SYMBOLIC
+	$(RM) $(OBJECTS) $(TARGET)
 
 # build executable
-$(EXEC): $(OBJECTS)
-	$(LD) name $@ $(foreach OBJ,$^,file $(OBJ)) $(LDFLAGS)
+$(TARGET): $(OBJECTS) $(TARGET).lnk
+	$(LD) @$(TARGET).lnk
+
+# link file
+$(TARGET).lnk:
+	echo name $(TARGET) >$(TARGET).lnk
+	echo system $(SYS) >>$(TARGET).lnk
+	for %i in ($(OBJECTS)) do echo file %i >>$(TARGET).lnk
 
 # generic c object rule
-%.obj: %.c
-	$(CC) -c $(CFLAGS) -fo=$@ $<
+.c.obj:
+	$(CC) $(CFLAGS) $*.c -fo=$*.obj

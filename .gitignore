@@ -6,6 +6,8 @@
 *.exe
 *.swp
 *.SWP
+*.lnk
+*.rsp
 /source/test_sdl2_01
 /source/test_sdl2_02
 /source/dosbox-x.*
