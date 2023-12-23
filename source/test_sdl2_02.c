@@ -25,7 +25,7 @@ SOFTWARE.
 
 /*
  *
- * TEST_SDL2.C
+ * TEST_SDL2_02.C
  *
  */
 
@@ -47,9 +47,10 @@ static SDL_Rect blitrect;
 static SDL_bool running;
 static SDL_Event event;
 
-void my_cool_button_callback(void *user)
+/* button callback */
+void quit_callback(void *user)
 {
-	printf("My cool button was pressed!\n");
+	running = SDL_FALSE;
 }
 
 /* install palette to SDL_Surface */
@@ -91,6 +92,9 @@ int main(int argc, char **argv)
 		WIDTH, HEIGHT,
 		SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI
 	);
+
+	/* set window borderless */
+	SDL_SetWindowBordered(window, SDL_FALSE);
 
 	/* set window size */
 	SDL_SetWindowMinimumSize(window, WIDTH, HEIGHT);
@@ -146,13 +150,21 @@ int main(int argc, char **argv)
 		if (eui_begin_sdl2(surface8));
 		{
 			/* clear */
-			eui_clear(18);
+			eui_clear(15);
 
-			/* set alignment to center */
+			/* border */
+			eui_border_box(EUI_VEC2(0, 0), EUI_VEC2(WIDTH, HEIGHT), 2, 0);
+
+			/* title */
+			eui_border_box(EUI_VEC2(0, 0), EUI_VEC2(WIDTH, 18), 2, 0);
+			eui_push_frame(EUI_VEC2(0, 0), EUI_VEC2(WIDTH, 18));
 			eui_set_align(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
+			eui_text(EUI_VEC2(0, 0), 0, "eui");
+			eui_pop_frame();
 
-			/* button */
-			eui_button(EUI_VEC2(0, 0), EUI_VEC2(128, 16), "My Cool Button", my_cool_button_callback, NULL);
+			/* quit button */
+			eui_set_align(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
+			eui_button(EUI_VEC2(0, 0), EUI_VEC2(48, 16), "Quit", quit_callback, NULL);
 
 			/* end eui */
 			eui_end();

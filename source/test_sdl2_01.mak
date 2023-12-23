@@ -9,10 +9,10 @@ override CFLAGS += $(shell $(PKGCONFIG) sdl2 --cflags)
 override LDFLAGS += $(shell $(PKGCONFIG) sdl2 --libs)
 
 # executable name
-EXEC ?= test_sdl2
+EXEC ?= test_sdl2_01
 
 # objects
-OBJECTS = test_sdl2.o eui.o eui_sdl2.o
+OBJECTS = test_sdl2_01.o eui.o eui_sdl2.o
 
 # clean and build execs
 all: clean $(EXEC)

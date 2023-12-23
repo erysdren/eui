@@ -6,5 +6,6 @@
 *.exe
 *.swp
 *.SWP
-/source/test_sdl2
+/source/test_sdl2_01
+/source/test_sdl2_02
 /source/dosbox-x.*
