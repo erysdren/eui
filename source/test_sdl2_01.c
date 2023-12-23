@@ -160,7 +160,7 @@ int main(int argc, char **argv)
 			pos.x = 0;
 			pos.y = 0;
 			size.x = 128;
-			size.y = 64;
+			size.y = 16;
 			if (eui_button(pos, size, "My Cool Button", my_cool_button_callback, NULL))
 			{
 				pos.x = 0;
