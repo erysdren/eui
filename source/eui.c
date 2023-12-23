@@ -248,6 +248,9 @@ static int key_buffer[KEY_BUFFER_SIZE] = {0};
 static int key_buffer_ridx = 0;
 static int key_buffer_widx = 0;
 
+/* configuration state */
+static eui_config_t config = {0};
+
 /*
  *
  * local functions
@@ -559,6 +562,18 @@ bool eui_begin(eui_pixelmap_t dest)
 void eui_end(void)
 {
 
+}
+
+/*
+ *
+ * configuration
+ *
+ */
+
+/* get modifiable config struct */
+eui_config_t *eui_get_config(void)
+{
+	return &config;
 }
 
 /*
@@ -999,13 +1014,26 @@ bool eui_button(eui_vec2_t pos, eui_vec2_t size, char *text, eui_callback callba
 	static bool clicked;
 	bool hovered;
 
-	eui_filled_box(pos, size, 31);
-	eui_push_frame(pos, size);
-	eui_set_align(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
-	eui_text(EUI_VEC2(0, 0), 0, text);
-	eui_pop_frame();
-
 	hovered = eui_is_hovered(pos, size);
+
+	if (hovered)
+	{
+		eui_filled_box(pos, size, config.button.bg_color_hover);
+		eui_border_box(pos, size, config.button.border_width, config.button.border_color_hover);
+		eui_push_frame(pos, size);
+		eui_set_align(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
+		eui_text(EUI_VEC2(0, 0), config.button.text_color_hover, text);
+		eui_pop_frame();
+	}
+	else
+	{
+		eui_filled_box(pos, size, config.button.bg_color);
+		eui_border_box(pos, size, config.button.border_width, config.button.border_color);
+		eui_push_frame(pos, size);
+		eui_set_align(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
+		eui_text(EUI_VEC2(0, 0), config.button.text_color, text);
+		eui_pop_frame();
+	}
 
 	if (hovered && button && !clicked)
 	{

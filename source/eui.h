@@ -184,6 +184,19 @@ typedef union eui_event_t {
 	struct { int type; int x; int y; int button; } button;
 } eui_event_t;
 
+/* configuration */
+typedef struct eui_config_t {
+	struct {
+		eui_color_t border_color;
+		eui_color_t border_color_hover;
+		eui_color_t bg_color;
+		eui_color_t bg_color_hover;
+		eui_color_t text_color;
+		eui_color_t text_color_hover;
+		int border_width;
+	} button;
+} eui_config_t;
+
 /* pixelmap */
 typedef struct eui_pixelmap_t {
 	int w;
@@ -271,6 +284,15 @@ bool eui_begin(eui_pixelmap_t dest);
 
 /* end eui */
 void eui_end(void);
+
+/*
+ *
+ * configuration
+ *
+ */
+
+/* get modifiable config struct */
+eui_config_t *eui_get_config(void);
 
 /*
  *

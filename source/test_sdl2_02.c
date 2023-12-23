@@ -83,6 +83,7 @@ int main(int argc, char **argv)
 	uint32_t format;
 	unsigned int rmask, gmask, bmask, amask;
 	int bpp;
+	eui_config_t *eui_config;
 
 	EUI_UNUSED(argc);
 	EUI_UNUSED(argv);
@@ -132,6 +133,20 @@ int main(int argc, char **argv)
 	blitrect.y = 0;
 	blitrect.w = WIDTH;
 	blitrect.h = HEIGHT;
+
+	/* configure eui */
+	eui_config = eui_get_config();
+
+	eui_config->button.text_color = 0;
+	eui_config->button.text_color_hover = 15;
+
+	eui_config->button.bg_color = 15;
+	eui_config->button.bg_color_hover = 0;
+
+	eui_config->button.border_color = 0;
+	eui_config->button.border_color_hover = 15;
+
+	eui_config->button.border_width = 1;
 
 	/* main loop */
 	running = SDL_TRUE;
