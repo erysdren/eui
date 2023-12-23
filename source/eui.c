@@ -34,6 +34,7 @@ SOFTWARE.
 #include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <limits.h>
 
 #include "eui.h"
 
@@ -880,8 +881,8 @@ void eui_filled_triangle(eui_vec2_t p0, eui_vec2_t p1, eui_vec2_t p2, eui_color_
 	/* init edge table */
 	for (y = 0; y < drawdest.h; y++)
 	{
-		edge_table[y][0] = INT32_MAX;
-		edge_table[y][1] = INT32_MIN;
+		edge_table[y][0] = INT_MAX;
+		edge_table[y][1] = INT_MIN;
 	}
 
 	/* transform points */

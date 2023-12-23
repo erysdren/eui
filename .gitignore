@@ -1,4 +1,8 @@
+
+# local only
 /**/untracked*/
+
+# objects and other ephemera
 *.o
 *.obj
 *.err
@@ -8,6 +12,14 @@
 *.SWP
 *.lnk
 *.rsp
+
+# linux executables
 /source/test_sdl2_01
 /source/test_sdl2_02
+
+# result from test_ia16.com
+/source/screen.dat
+/source/SCREEN.DAT
+
+# dosbox-x launcher
 /source/dosbox-x.*
