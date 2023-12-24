@@ -124,10 +124,53 @@ unsigned char palette[768] = {
 	0xe0, 0x70, 0xe0, 0xe8, 0x74, 0xe8, 0xf0, 0x78, 0xf0, 0xfc, 0x80, 0xfc
 };
 
+/* pen icon */
+#define pen_width 16
+#define pen_height 16
+static unsigned char pen_bits[] = {
+	0xff, 0xff, 0x01, 0x80, 0x01, 0x80, 0x01, 0x82, 0x01, 0x87, 0x01, 0x8e,
+	0x81, 0x9c, 0xc1, 0x89, 0xe1, 0x83, 0xf1, 0x81, 0xf1, 0x80, 0x79, 0x80,
+	0x19, 0x80, 0x01, 0x80, 0x01, 0x80, 0xff, 0xff
+};
+
+/* selected pen icon */
+#define pen_selected_width 16
+#define pen_selected_height 16
+static unsigned char pen_selected_bits[] = {
+	0x00, 0x00, 0xfe, 0x7f, 0xfe, 0x7f, 0xfe, 0x7d, 0xfe, 0x78, 0xfe, 0x71,
+	0x7e, 0x63, 0x3e, 0x76, 0x1e, 0x7c, 0x0e, 0x7e, 0x0e, 0x7f, 0x86, 0x7f,
+	0xe6, 0x7f, 0xfe, 0x7f, 0xfe, 0x7f, 0x00, 0x00
+};
+
+/* bucket icon */
+#define bucket_width 16
+#define bucket_height 16
+static unsigned char bucket_bits[] = {
+	0xff, 0xff, 0x01, 0x80, 0x01, 0x80, 0x01, 0x80, 0x89, 0x81, 0xd1, 0x83,
+	0x61, 0x9e, 0x71, 0xa4, 0x99, 0xa4, 0x0d, 0xae, 0x19, 0xab, 0xb1, 0xb9,
+	0xe1, 0x90, 0x41, 0x80, 0x01, 0x80, 0xff, 0xff
+};
+
+/* selected bucket icon */
+#define bucket_selected_width 16
+#define bucket_selected_height 16
+static unsigned char bucket_selected_bits[] = {
+	0x00, 0x00, 0xfe, 0x7f, 0xfe, 0x7f, 0xfe, 0x7f, 0x76, 0x7e, 0x2e, 0x7c,
+	0x9e, 0x61, 0x8e, 0x5b, 0x66, 0x5b, 0xf2, 0x51, 0xe6, 0x54, 0x4e, 0x46,
+	0x1e, 0x6f, 0xbe, 0x7f, 0xfe, 0x7f, 0x00, 0x00
+};
+
 static struct {
 	uint16_t walls[MAP_HEIGHT][MAP_WIDTH];
 	uint16_t objects[MAP_HEIGHT][MAP_WIDTH];
 } tilemap;
+
+enum {
+	TOOL_PEN,
+	TOOL_FILL
+};
+
+static int current_tool = TOOL_PEN;
 
 static int current_layer = 0;
 static eui_color_t current_color = 63;
@@ -163,7 +206,7 @@ void button_save(void *user)
 		return;
 
 	file = fopen(filename, "wb");
-	fwrite(tilemap.walls, sizeof(tilemap.walls), 1, file);
+	fwrite(&tilemap, sizeof(tilemap), 1, file);
 	fclose(file);
 }
 
@@ -181,7 +224,7 @@ void button_load(void *user)
 		return;
 
 	file = fopen(filename, "rb");
-	fread(tilemap.walls, sizeof(tilemap.walls), 1, file);
+	fread(&tilemap, sizeof(tilemap), 1, file);
 	fclose(file);
 }
 
@@ -403,6 +446,37 @@ int main(int argc, char **argv)
 				eui_text(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 20), 31, "tile=--x--");
 				eui_text(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 31, "color=---");
 			}
+
+			/* move to top left alignment */
+			eui_set_align(EUI_ALIGN_END, EUI_ALIGN_START);
+
+			/* bucket button */
+			pos.x = -4;
+			pos.y = (tilemap_pos.y / 2) - (pen_height / 2);
+			size.x = bucket_width;
+			size.y = bucket_height;
+			if (current_tool == TOOL_FILL)
+				eui_xbm(pos, 31, bucket_selected_width, bucket_selected_height, bucket_selected_bits);
+			else
+				eui_xbm(pos, 31, bucket_width, bucket_height, bucket_bits);
+
+			/* select bucket */
+			if (eui_is_hovered(pos, size) && eui_get_button() & EUI_BUTTON_LEFT)
+				current_tool = TOOL_FILL;
+
+			/* pen button */
+			pos.x = (pen_width + 8) * -1;
+			pos.y = (tilemap_pos.y / 2) - (pen_height / 2);
+			size.x = pen_width;
+			size.y = pen_height;
+			if (current_tool == TOOL_PEN)
+				eui_xbm(pos, 31, pen_selected_width, pen_selected_height, pen_selected_bits);
+			else
+				eui_xbm(pos, 31, pen_width, pen_height, pen_bits);
+
+			/* select pen */
+			if (eui_is_hovered(pos, size) && eui_get_button() & EUI_BUTTON_LEFT)
+				current_tool = TOOL_PEN;
 
 			/* move to bottom alignment */
 			eui_set_align(EUI_ALIGN_START, EUI_ALIGN_END);
