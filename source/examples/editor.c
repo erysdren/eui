@@ -228,6 +228,94 @@ void button_load(void *user)
 	fclose(file);
 }
 
+
+/* flood fill part of tilemap */
+#define PUSH(_x, _y) \
+	{ \
+		stack_count++; \
+		stack[stack_count].x = _x; \
+		stack[stack_count].y = _y; \
+	}
+#define POP(_x, _y) \
+	{ \
+		_x = stack[stack_count].x; \
+		_y = stack[stack_count].y; \
+		stack[stack_count].x = 0; \
+		stack[stack_count].y = 0; \
+		stack_count--; \
+	}
+void tool_fill(int x, int y, eui_color_t color)
+{
+	static eui_vec2_t stack[MAP_WIDTH * MAP_HEIGHT * 4];
+	int stack_count;
+	eui_color_t seed;
+	eui_color_t read;
+	static int clicked;
+
+	if (!eui_get_button())
+	{
+		clicked = EUI_FALSE;
+		return;
+	}
+
+	if (eui_get_button() & EUI_BUTTON_RIGHT)
+		color = 0;
+
+	if (clicked)
+		return;
+
+	/* get seed color */
+	seed = tilemap.walls[y][x];
+
+	if (seed == color)
+		return;
+
+	/* push first value to stack */
+	stack_count = 0;
+	PUSH(x, y);
+
+	/* do flood fill */
+	while (stack_count)
+	{
+		POP(x, y);
+
+		/* out of bounds */
+		if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT)
+			continue;
+
+		/* read color */
+		read = tilemap.walls[y][x];
+
+		/* it's a match */
+		if (read == seed)
+		{
+			tilemap.walls[y][x] = color;
+
+			PUSH(x + 1, y);
+			PUSH(x - 1, y);
+			PUSH(x, y + 1);
+			PUSH(x, y - 1);
+		}
+	}
+
+	clicked = EUI_TRUE;
+}
+#undef PUSH
+#undef POP
+
+/* plot color on tilemap */
+void tool_draw(int x, int y, eui_color_t color)
+{
+	if (!eui_get_button())
+		return;
+
+	if (eui_get_button() & EUI_BUTTON_RIGHT)
+		color = 0;
+
+	/* plot color */
+	tilemap.walls[y][x] = color;
+}
+
 /* main */
 int main(int argc, char **argv)
 {
@@ -435,10 +523,16 @@ int main(int argc, char **argv)
 				eui_textf(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 31, "color=%03d", tilemap.walls[selected_tile.y][selected_tile.x]);
 
 				/* do tile interaction */
-				if (eui_get_button() & EUI_BUTTON_LEFT)
-					tilemap.walls[selected_tile.y][selected_tile.x] = current_color;
-				else if (eui_get_button() & EUI_BUTTON_RIGHT)
-					tilemap.walls[selected_tile.y][selected_tile.x] = 0;
+				switch (current_tool)
+				{
+					case TOOL_PEN:
+						tool_draw(selected_tile.x, selected_tile.y, current_color);
+						break;
+
+					case TOOL_FILL:
+						tool_fill(selected_tile.x, selected_tile.y, current_color);
+						break;
+				}
 			}
 			else
 			{
