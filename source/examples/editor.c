@@ -727,11 +727,11 @@ int main(int argc, char **argv)
 	}
 
 	/* quit */
-	SDL_DestroyWindow(window);
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyTexture(texture);
 	SDL_FreeSurface(surface8);
 	SDL_FreeSurface(surface32);
+	SDL_DestroyTexture(texture);
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
 	SDL_Quit();
 
 	return 0;
