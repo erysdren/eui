@@ -182,10 +182,7 @@ static unsigned char rect_selected_bits[] = {
 	0x06, 0x60, 0xfe, 0x7f, 0xfe, 0x7f, 0x00, 0x00
 };
 
-static struct {
-	uint16_t walls[MAP_HEIGHT][MAP_WIDTH];
-	uint16_t objects[MAP_HEIGHT][MAP_WIDTH];
-} tilemap;
+static uint8_t bitmap[MAP_HEIGHT][MAP_WIDTH];
 
 /* temp layer */
 int templayer[MAP_HEIGHT][MAP_WIDTH];
@@ -201,6 +198,9 @@ static int current_tool = TOOL_PEN;
 static int current_layer = 0;
 static eui_color_t current_color = 63;
 
+/* filter patterns for save/load dialogs */
+static const char *filter_patterns[1] = {"*.bmp"};
+
 static SDL_Window *window;
 static SDL_Surface *surface8;
 static SDL_Surface *surface32;
@@ -215,7 +215,7 @@ void button_clear(void *user)
 {
 	EUI_UNUSED(user);
 
-	memset(&tilemap, 0, sizeof(tilemap));
+	memset(bitmap, 0, sizeof(bitmap));
 	memset(templayer, -1, sizeof(templayer));
 }
 
@@ -223,36 +223,88 @@ void button_clear(void *user)
 void button_save(void *user)
 {
 	char *filename;
-	FILE *file;
+	int y;
+	SDL_Surface *bmp;
+	uint8_t *ptr;
 
 	EUI_UNUSED(user);
 
-	filename = tinyfd_saveFileDialog("Save Map", "map.dat", 0, NULL, NULL);
+	filename = tinyfd_saveFileDialog("Save BMP", "image.bmp", 1, filter_patterns, "BMP Files");
 
 	if (filename == NULL)
 		return;
 
-	file = fopen(filename, "wb");
-	fwrite(&tilemap, sizeof(tilemap), 1, file);
-	fclose(file);
+	/* create bmp surface */
+	bmp = SDL_CreateRGBSurface(0, MAP_WIDTH, MAP_HEIGHT, 8, 0, 0, 0, 0);
+	if (bmp == NULL)
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL Error", SDL_GetError(), NULL);
+		return;
+	}
+
+	/* set palette */
+	SDL_SetPaletteColors(bmp->format->palette, colors, 0, 256);
+
+	/* copy in bitmap */
+	ptr = (uint8_t *)bmp->pixels;
+	for (y = 0; y < bmp->h; y++)
+	{
+		memcpy(ptr, &bitmap[y][0], bmp->w * sizeof(eui_color_t));
+		ptr += bmp->pitch;
+	}
+
+	/* save bmp to disk */
+	if (SDL_SaveBMP(bmp, filename) != 0)
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL Error", SDL_GetError(), NULL);
+	}
+
+	SDL_FreeSurface(bmp);
 }
 
 /* load button */
 void button_load(void *user)
 {
 	char *filename;
-	FILE *file;
+	SDL_Surface *bmp;
+	int y;
+	uint8_t *ptr;
 
 	EUI_UNUSED(user);
 
-	filename = tinyfd_openFileDialog("Load Map", "map.dat", 0, NULL, NULL, 0);
+	filename = tinyfd_openFileDialog("Load BMP", "image.bmp", 1, filter_patterns, "BMP Files", 0);
 
 	if (filename == NULL)
 		return;
 
-	file = fopen(filename, "rb");
-	fread(&tilemap, sizeof(tilemap), 1, file);
-	fclose(file);
+	bmp = SDL_LoadBMP(filename);
+
+	if (bmp == NULL)
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL Error", SDL_GetError(), NULL);
+		return;
+	}
+
+	if (bmp->format->BytesPerPixel != sizeof(eui_color_t))
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Editor Error", "Image does not have the correct color depth", NULL);
+		return;
+	}
+
+	if (bmp->w != MAP_WIDTH || bmp->h != MAP_HEIGHT)
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Editor Error", "Image does not have the correct dimensions", NULL);
+		return;
+	}
+
+	ptr = (uint8_t *)bmp->pixels;
+	for (y = 0; y < bmp->h; y++)
+	{
+		memcpy(&bitmap[y][0], ptr, bmp->w * sizeof(eui_color_t));
+		ptr += bmp->pitch;
+	}
+
+	SDL_FreeSurface(bmp);
 }
 
 
@@ -292,7 +344,7 @@ void tool_fill(int x, int y, eui_color_t color)
 		return;
 
 	/* get seed color */
-	seed = tilemap.walls[y][x];
+	seed = bitmap[y][x];
 
 	if (seed == color)
 		return;
@@ -311,12 +363,12 @@ void tool_fill(int x, int y, eui_color_t color)
 			continue;
 
 		/* read color */
-		read = tilemap.walls[y][x];
+		read = bitmap[y][x];
 
 		/* it's a match */
 		if (read == seed)
 		{
-			tilemap.walls[y][x] = color;
+			bitmap[y][x] = color;
 
 			PUSH(x + 1, y);
 			PUSH(x - 1, y);
@@ -340,7 +392,7 @@ void tool_pen(int x, int y, eui_color_t color)
 		color = 0;
 
 	/* plot color */
-	tilemap.walls[y][x] = color;
+	bitmap[y][x] = color;
 }
 
 /* draw hollow rectangle on tilemap */
@@ -362,7 +414,7 @@ void tool_rect(int x, int y, eui_color_t color)
 				for (xx = 0; xx < MAP_WIDTH; xx++)
 				{
 					if (templayer[yy][xx] >= 0)
-						tilemap.walls[yy][xx] = templayer[yy][xx];
+						bitmap[yy][xx] = templayer[yy][xx];
 				}
 			}
 
@@ -588,7 +640,7 @@ int main(int argc, char **argv)
 					tile_pos.y = tilemap_pos.y + (y * TILE_HEIGHT);
 
 					/* draw tile */
-					eui_filled_box(tile_pos, tile_size, tilemap.walls[y][x]);
+					eui_filled_box(tile_pos, tile_size, bitmap[y][x]);
 
 					/* temp layer value */
 					if (templayer[y][x] >= 0)
@@ -625,7 +677,7 @@ int main(int argc, char **argv)
 
 				/* draw selected tile */
 				eui_textf(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 20), 31, "tile=%02dx%02d", selected_tile.x, selected_tile.y);
-				eui_textf(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 31, "color=%03d", tilemap.walls[selected_tile.y][selected_tile.x]);
+				eui_textf(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 31, "color=%03d", bitmap[selected_tile.y][selected_tile.x]);
 
 				/* do tile interaction */
 				switch (current_tool)
