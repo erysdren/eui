@@ -232,3 +232,19 @@ void eui_push_event_sdl2(SDL_Event *event)
 			break;
 	}
 }
+
+/* draw SDL_Surface, transformed */
+void eui_pixelmap_sdl2(eui_vec2_t pos, SDL_Surface *surface)
+{
+	eui_pixelmap_t pm;
+
+	if (sizeof(eui_color_t) != surface->format->BytesPerPixel)
+		return;
+
+	pm.w = surface->w;
+	pm.h = surface->h;
+	pm.pitch = surface->pitch;
+	pm.pixels = (eui_color_t *)surface->pixels;
+
+	eui_pixelmap(pos, pm);
+}

@@ -38,6 +38,9 @@ int eui_begin_sdl2(SDL_Surface *surface);
 /* process and push SDL2 event */
 void eui_push_event_sdl2(SDL_Event *event);
 
+/* draw SDL_Surface, transformed */
+void eui_pixelmap_sdl2(eui_vec2_t pos, SDL_Surface *surface);
+
 #ifdef __cplusplus
 }
 #endif
