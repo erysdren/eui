@@ -24,7 +24,7 @@ SOFTWARE.
 
 /*
  *
- * TEST_BASIC.C
+ * BASIC.C
  *
  */
 

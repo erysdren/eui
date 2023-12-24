@@ -24,7 +24,7 @@ SOFTWARE.
 
 /*
  *
- * TEST_WATCOM.C
+ * DOS32.C
  *
  */
 

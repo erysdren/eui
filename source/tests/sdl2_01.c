@@ -24,7 +24,7 @@ SOFTWARE.
 
 /*
  *
- * TEST_SDL2_01.C
+ * SDL2_01.C
  *
  */
 

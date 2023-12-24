@@ -46,8 +46,8 @@ enum {
 
 /* button type */
 enum {
-	EUI_BUTTON_LEFT,
-	EUI_BUTTON_RIGHT
+	EUI_BUTTON_LEFT = 1,
+	EUI_BUTTON_RIGHT = 2
 };
 
 /* event type */
@@ -309,6 +309,12 @@ void eui_clear(eui_color_t color);
 
 /* draw built-in cursor */
 void eui_cursor(eui_color_t color);
+
+/* get cursor position */
+eui_vec2_t eui_get_cursor_pos(void);
+
+/* get button state */
+int eui_get_button(void);
 
 /*
  *

@@ -566,11 +566,11 @@ int eui_begin(eui_pixelmap_t dest)
 				break;
 
 			case EUI_EVENT_BUTTON_DOWN:
-				button = 1;
+				button |= event.button.button;
 				break;
 
 			case EUI_EVENT_BUTTON_UP:
-				button = 0;
+				button &= ~event.button.button;
 				break;
 		}
 	}
@@ -669,6 +669,18 @@ void eui_cursor(eui_color_t color)
 	pos.x = mouse.x - 3;
 	pos.y = mouse.y - 3;
 	eui_font8x8(pos, font8x8_basic['x'], color);
+}
+
+/* get cursor position */
+eui_vec2_t eui_get_cursor_pos(void)
+{
+	return mouse;
+}
+
+/* get button state */
+int eui_get_button(void)
+{
+	return button;
 }
 
 /*
