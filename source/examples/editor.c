@@ -182,6 +182,25 @@ static unsigned char rect_selected_bits[] = {
 	0x06, 0x60, 0xfe, 0x7f, 0xfe, 0x7f, 0x00, 0x00
 };
 
+/* filled rect icon */
+#define filled_rect_width 16
+#define filled_rect_height 16
+static unsigned char filled_rect_bits[] = {
+	0xff, 0xff, 0x01, 0x80, 0x01, 0x80, 0xf9, 0x9f, 0xf9, 0x9f, 0xf9, 0x9f,
+	0xf9, 0x9f, 0xf9, 0x9f, 0xf9, 0x9f, 0xf9, 0x9f, 0xf9, 0x9f, 0xf9, 0x9f,
+	0xf9, 0x9f, 0x01, 0x80, 0x01, 0x80, 0xff, 0xff
+};
+
+/* selected filled rect icon */
+#define filled_rect_selected_width 16
+#define filled_rect_selected_height 16
+static unsigned char filled_rect_selected_bits[] = {
+	0x00, 0x00, 0xfe, 0x7f, 0xfe, 0x7f, 0x06, 0x60, 0x06, 0x60, 0x06, 0x60,
+	0x06, 0x60, 0x06, 0x60, 0x06, 0x60, 0x06, 0x60, 0x06, 0x60, 0x06, 0x60,
+	0x06, 0x60, 0xfe, 0x7f, 0xfe, 0x7f, 0x00, 0x00
+};
+
+/* bitmap */
 static uint8_t bitmap[BITMAP_HEIGHT][BITMAP_WIDTH];
 
 /* temp layer */
@@ -190,7 +209,8 @@ int templayer[BITMAP_HEIGHT][BITMAP_WIDTH];
 enum {
 	TOOL_PEN,
 	TOOL_FILL,
-	TOOL_RECT
+	TOOL_RECT,
+	TOOL_FILLED_RECT
 };
 
 static int current_tool = TOOL_PEN;
@@ -494,6 +514,101 @@ void tool_rect(int x, int y, eui_color_t color)
 		started = EUI_TRUE;
 	}
 }
+/* draw filled rectangle on bitmap */
+void tool_filled_rect(int x, int y, eui_color_t color)
+{
+	static eui_vec2_t startpos;
+	static eui_vec2_t endpos;
+	static int started;
+	int xx, yy;
+	int xsgn, ysgn;
+
+	/* user is not pressing a button */
+	if (!eui_get_button())
+	{
+		/* we've already staretd drawing, so write changes */
+		if (started)
+		{
+			/* write changes to bitmap */
+			for (yy = 0; yy < BITMAP_HEIGHT; yy++)
+			{
+				for (xx = 0; xx < BITMAP_WIDTH; xx++)
+				{
+					if (templayer[yy][xx] >= 0)
+						bitmap[yy][xx] = templayer[yy][xx];
+				}
+			}
+
+			/* no longer started */
+			started = EUI_FALSE;
+		}
+
+		/* clear temp layer */
+		memset(templayer, -1, sizeof(templayer));
+		return;
+	}
+
+	/* right click erases */
+	if (eui_get_button() & EUI_BUTTON_RIGHT)
+		color = 0;
+
+	/* already started drawing */
+	if (started)
+	{
+		/* set endpos */
+		endpos.x = x;
+		endpos.y = y;
+
+		/* get draw direction for lines */
+		xsgn = SGN(endpos.x - startpos.x);
+		ysgn = SGN(endpos.y - startpos.y);
+
+		/* clear temp layer */
+		memset(templayer, -1, sizeof(templayer));
+
+		/* vertical lines */
+		for (yy = startpos.y; yy != endpos.y; yy += ysgn)
+		{
+			if (yy < 0 || yy >= BITMAP_HEIGHT)
+				break;
+			templayer[yy][startpos.x] = color;
+			templayer[yy][endpos.x] = color;
+		}
+
+		/* horizontal lines */
+		for (xx = startpos.x; xx != endpos.x; xx += xsgn)
+		{
+			if (xx < 0 || xx >= BITMAP_WIDTH)
+				break;
+			templayer[startpos.y][xx] = color;
+			templayer[endpos.y][xx] = color;
+		}
+
+		/* filling */
+		for (yy = startpos.y; yy != endpos.y; yy += ysgn)
+		{
+			if (yy < 0 || yy >= BITMAP_HEIGHT || xx < 0 || xx >= BITMAP_WIDTH)
+				break;
+
+			for (xx = startpos.x; xx != endpos.x; xx += xsgn)
+			{
+				templayer[yy][xx] = color;
+			}
+		}
+
+		/* fill last point */
+		templayer[endpos.y][endpos.x] = color;
+	}
+	else
+	{
+		/* set startpos */
+		startpos.x = x;
+		startpos.y = y;
+
+		/* user started drawing */
+		started = EUI_TRUE;
+	}
+}
 
 /* main */
 int main(int argc, char **argv)
@@ -738,6 +853,10 @@ int main(int argc, char **argv)
 					case TOOL_RECT:
 						tool_rect(selected_pixel.x, selected_pixel.y, current_color);
 						break;
+
+					case TOOL_FILLED_RECT:
+						tool_filled_rect(selected_pixel.x, selected_pixel.y, current_color);
+						break;
 				}
 			}
 			else
@@ -757,8 +876,22 @@ int main(int argc, char **argv)
 			/* move to top left alignment */
 			eui_set_align(EUI_ALIGN_END, EUI_ALIGN_START);
 
-			/* rect button */
+			/* filled rect button */
 			pos.x = -4;
+			pos.y = (bitmap_pos.y / 2) - (filled_rect_height / 2);
+			size.x = filled_rect_width;
+			size.y = filled_rect_height;
+			if (current_tool == TOOL_FILLED_RECT)
+				eui_xbm(pos, 31, filled_rect_selected_width, filled_rect_selected_height, filled_rect_selected_bits);
+			else
+				eui_xbm(pos, 31, filled_rect_width, filled_rect_height, filled_rect_bits);
+
+			/* select filled rect */
+			if (eui_is_hovered(pos, size) && eui_get_button())
+				current_tool = TOOL_FILLED_RECT;
+
+			/* rect button */
+			pos.x = -1 * rect_width - 8;
 			pos.y = (bitmap_pos.y / 2) - (rect_height / 2);
 			size.x = rect_width;
 			size.y = rect_height;
@@ -772,7 +905,7 @@ int main(int argc, char **argv)
 				current_tool = TOOL_RECT;
 
 			/* bucket button */
-			pos.x = -1 * bucket_width - 8;
+			pos.x = -1 * (bucket_width * 2) - 12;
 			pos.y = (bitmap_pos.y / 2) - (pen_height / 2);
 			size.x = bucket_width;
 			size.y = bucket_height;
@@ -786,7 +919,7 @@ int main(int argc, char **argv)
 				current_tool = TOOL_FILL;
 
 			/* pen button */
-			pos.x = -1 * (pen_width * 2) - 12;
+			pos.x = -1 * (pen_width * 3) - 16;
 			pos.y = (bitmap_pos.y / 2) - (pen_height / 2);
 			size.x = pen_width;
 			size.y = pen_height;
