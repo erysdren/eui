@@ -31,6 +31,8 @@ SOFTWARE.
 #include <stdio.h>
 #include <stdint.h>
 
+#include "tinyfiledialogs.h"
+
 #include "eui_sdl2.h"
 
 #define WIDTH (640)
@@ -139,6 +141,42 @@ static SDL_Rect blit_rect;
 static SDL_bool running;
 static SDL_Color colors[256];
 
+/* save button */
+void button_save(void *user)
+{
+	char *filename;
+	FILE *file;
+
+	EUI_UNUSED(user);
+
+	filename = tinyfd_saveFileDialog("Save Drawing", "map.dat", 0, NULL, NULL);
+
+	if (filename == NULL)
+		return;
+
+	file = fopen(filename, "wb");
+	fwrite(tilemap.walls, sizeof(tilemap.walls), 1, file);
+	fclose(file);
+}
+
+/* load button */
+void button_load(void *user)
+{
+	char *filename;
+	FILE *file;
+
+	EUI_UNUSED(user);
+
+	filename = tinyfd_openFileDialog("Save Drawing", "map.dat", 0, NULL, NULL, 0);
+
+	if (filename == NULL)
+		return;
+
+	file = fopen(filename, "rb");
+	fread(tilemap.walls, sizeof(tilemap.walls), 1, file);
+	fclose(file);
+}
+
 /* main */
 int main(int argc, char **argv)
 {
@@ -150,6 +188,7 @@ int main(int argc, char **argv)
 	eui_vec2_t selected_tile;
 	eui_vec2_t tile_pos, tile_size;
 	eui_vec2_t palette_pos, palette_size, palette_entry_size;
+	eui_vec2_t pos, size;
 	SDL_Event event;
 	int i;
 	int x, y;
@@ -341,7 +380,8 @@ int main(int argc, char **argv)
 				eui_border_box(tile_pos, tile_size, 1, 255);
 
 				/* draw selected tile */
-				eui_textf(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 31, "tile=%02dx%02d", selected_tile.x, selected_tile.y);
+				eui_textf(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 20), 31, "tile=%02dx%02d", selected_tile.x, selected_tile.y);
+				eui_textf(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 31, "color=%02d", tilemap.walls[selected_tile.y][selected_tile.x]);
 
 				/* do tile interaction */
 				if (eui_get_button() & EUI_BUTTON_LEFT)
@@ -352,8 +392,24 @@ int main(int argc, char **argv)
 			else
 			{
 				/* draw selected tile */
-				eui_text(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 31, "tile=--x--");
+				eui_text(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 20), 31, "tile=--x--");
+				eui_text(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 31, "color=--");
 			}
+
+			/* move to bottom alignment */
+			eui_set_align(EUI_ALIGN_START, EUI_ALIGN_END);
+
+			/* save button */
+			pos.x = 0;
+			pos.y = 0;
+			size.x = tilemap_pos.x / 2;
+			size.y = 24;
+			eui_button(pos, size, "Save", button_save, NULL);
+
+			/* load button */
+			pos.x = tilemap_pos.x - size.x;
+			pos.y = 0;
+			eui_button(pos, size, "Load", button_load, NULL);
 
 			/* end eui */
 			eui_end();

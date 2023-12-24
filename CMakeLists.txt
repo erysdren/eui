@@ -54,8 +54,10 @@ if(SDL2_FOUND)
 	add_executable(editor
 		${PROJECT_SOURCE_DIR}/source/examples/editor.c
 		${PROJECT_SOURCE_DIR}/source/eui.c
-		${PROJECT_SOURCE_DIR}/source/eui_sdl2.c)
+		${PROJECT_SOURCE_DIR}/source/eui_sdl2.c
+		${PROJECT_SOURCE_DIR}/source/thirdparty/tinyfiledialogs.c)
 	target_link_libraries(editor PUBLIC SDL2::Main)
 	target_compile_definitions(editor PUBLIC EUI_PIXEL_DEPTH=8)
 	target_include_directories(editor PUBLIC ${PROJECT_SOURCE_DIR}/source)
+	target_include_directories(editor PUBLIC ${PROJECT_SOURCE_DIR}/source/thirdparty)
 endif()

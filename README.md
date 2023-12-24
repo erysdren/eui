@@ -32,6 +32,7 @@ While CMake is used to build the test programs, it is not required for EUI itsel
 - [font8x8](https://github.com/dhepper/font8x8/) (License: Public Domain)
 - [Danelaw](https://thingvellir.net/git/danelaw/) (License: CC0 1.0)
 - [SDL2 CMake modules](https://github.com/aminosbh/sdl2-cmake-modules) (License: BSD-3)
+- [tiny file dialog](https://sourceforge.net/projects/tinyfiledialogs/) (License: zlib)
 
 ## License
 
