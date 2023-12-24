@@ -196,7 +196,7 @@ enum {
 static int current_tool = TOOL_PEN;
 
 static int current_layer = 0;
-static eui_color_t current_color = 63;
+static eui_color_t current_color = 0;
 
 /* filter patterns for save/load dialogs */
 static const char *filter_patterns[1] = {"*.bmp"};
@@ -486,6 +486,8 @@ int main(int argc, char **argv)
 	eui_vec2_t tilemap_pos, tilemap_size;
 	eui_vec2_t cursor_pos;
 	eui_vec2_t selected_tile;
+	eui_vec2_t current_color_pos;
+	eui_vec2_t current_color_size;
 	eui_vec2_t tile_pos, tile_size;
 	eui_vec2_t palette_pos, palette_size, palette_entry_size;
 	eui_vec2_t pos, size;
@@ -550,6 +552,9 @@ int main(int argc, char **argv)
 	/* clear tilemap */
 	button_clear(NULL);
 
+	/* set default color */
+	current_color = 63;
+
 	/* main loop */
 	running = SDL_TRUE;
 	while (running)
@@ -606,6 +611,11 @@ int main(int argc, char **argv)
 
 			/* draw selected color */
 			eui_textf(EUI_VEC2(palette_pos.x, palette_pos.y - 10), 31, "color=%03d", current_color);
+			current_color_pos.x = ((current_color % 16) * palette_entry_size.x) + palette_pos.x - 1;
+			current_color_pos.y = ((current_color / 16) * palette_entry_size.y) + palette_pos.y - 1;
+			current_color_size.x = palette_entry_size.x + 2;
+			current_color_size.y = palette_entry_size.y + 2;
+			eui_border_box(current_color_pos, current_color_size, 1, 255);
 
 			/* do color interaction */
 			if (eui_is_hovered(palette_pos, palette_size))
@@ -617,6 +627,9 @@ int main(int argc, char **argv)
 
 				selected_color.x = (entry_pos.x - (entry_pos.x % ENTRY_WIDTH)) / ENTRY_WIDTH;
 				selected_color.y = (entry_pos.y - (entry_pos.y % ENTRY_HEIGHT)) / ENTRY_HEIGHT;
+
+				selected_color.x = CLAMP(selected_color.x, 0, 15);
+				selected_color.y = CLAMP(selected_color.y, 0, 15);
 
 				entry_pos.x = (selected_color.x * ENTRY_WIDTH) + palette_pos.x;
 				entry_pos.y = (selected_color.y * ENTRY_HEIGHT) + palette_pos.y;
