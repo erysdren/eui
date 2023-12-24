@@ -475,8 +475,6 @@ void eui_push_event(eui_event_t event)
 		return;
 	}
 
-	printf("EVENT ADDED! event_type=%d num_events=%d\n", event.type, num_events);
-
 	events[++num_events] = event;
 }
 
