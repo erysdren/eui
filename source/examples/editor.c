@@ -369,6 +369,9 @@ void tool_rect(int x, int y, eui_color_t color)
 			started = EUI_FALSE;
 		}
 
+		/* clear temp layer */
+		memset(templayer, -1, sizeof(templayer));
+
 		return;
 	}
 
@@ -645,6 +648,9 @@ int main(int argc, char **argv)
 				/* draw selected tile */
 				eui_text(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 20), 31, "tile=--x--");
 				eui_text(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 31, "color=---");
+
+			/* clear temp layer */
+			memset(templayer, -1, sizeof(templayer));
 			}
 
 			/* move to top left alignment */
