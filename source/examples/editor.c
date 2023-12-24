@@ -37,10 +37,10 @@ SOFTWARE.
 
 #define WIDTH (640)
 #define HEIGHT (480)
-#define TILE_WIDTH (7)
-#define TILE_HEIGHT (7)
-#define MAP_WIDTH (64)
-#define MAP_HEIGHT (64)
+#define PIXEL_WIDTH (7)
+#define PIXEL_HEIGHT (7)
+#define BITMAP_WIDTH (64)
+#define BITMAP_HEIGHT (64)
 #define ENTRY_WIDTH (11)
 #define ENTRY_HEIGHT (11)
 
@@ -182,10 +182,10 @@ static unsigned char rect_selected_bits[] = {
 	0x06, 0x60, 0xfe, 0x7f, 0xfe, 0x7f, 0x00, 0x00
 };
 
-static uint8_t bitmap[MAP_HEIGHT][MAP_WIDTH];
+static uint8_t bitmap[BITMAP_HEIGHT][BITMAP_WIDTH];
 
 /* temp layer */
-int templayer[MAP_HEIGHT][MAP_WIDTH];
+int templayer[BITMAP_HEIGHT][BITMAP_WIDTH];
 
 enum {
 	TOOL_PEN,
@@ -239,7 +239,7 @@ void button_save(void *user)
 		return;
 
 	/* create bmp surface */
-	bmp = SDL_CreateRGBSurface(0, MAP_WIDTH, MAP_HEIGHT, 8, 0, 0, 0, 0);
+	bmp = SDL_CreateRGBSurface(0, BITMAP_WIDTH, BITMAP_HEIGHT, 8, 0, 0, 0, 0);
 	if (bmp == NULL)
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL Error", SDL_GetError(), NULL);
@@ -299,7 +299,7 @@ void button_load(void *user)
 		return;
 	}
 
-	if (bmp->w != MAP_WIDTH || bmp->h != MAP_HEIGHT)
+	if (bmp->w != BITMAP_WIDTH || bmp->h != BITMAP_HEIGHT)
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Editor Error", "Image does not have the correct dimensions", NULL);
 		return;
@@ -316,7 +316,7 @@ void button_load(void *user)
 }
 
 
-/* flood fill part of tilemap */
+/* flood fill part of bitmap */
 #define PUSH(_x, _y) \
 	{ \
 		stack_count++; \
@@ -333,51 +333,58 @@ void button_load(void *user)
 	}
 void tool_fill(int x, int y, eui_color_t color)
 {
-	static eui_vec2_t stack[MAP_WIDTH * MAP_HEIGHT * 4];
+	static eui_vec2_t stack[BITMAP_WIDTH * BITMAP_HEIGHT * 4];
+	static int started;
 	int stack_count;
 	eui_color_t seed;
 	eui_color_t read;
-	static int clicked;
 
+	/* user is not pressing any buttons */
 	if (!eui_get_button())
 	{
-		clicked = EUI_FALSE;
+		started = EUI_FALSE;
 		return;
 	}
 
+	/* right click erases */
 	if (eui_get_button() & EUI_BUTTON_RIGHT)
 		color = 0;
 
-	if (clicked)
+	/* already doing it, don't do it again */
+	if (started)
 		return;
 
 	/* get seed color */
 	seed = bitmap[y][x];
 
+	/* prevent stack overflow */
 	if (seed == color)
 		return;
 
-	/* push first value to stack */
+	/* push first position to stack */
 	stack_count = 0;
 	PUSH(x, y);
 
 	/* do flood fill */
 	while (stack_count)
 	{
+		/* read stack value */
 		POP(x, y);
 
 		/* out of bounds */
-		if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT)
+		if (x < 0 || x >= BITMAP_WIDTH || y < 0 || y >= BITMAP_HEIGHT)
 			continue;
 
-		/* read color */
+		/* read pixel */
 		read = bitmap[y][x];
 
 		/* it's a match */
 		if (read == seed)
 		{
+			/* set pixel */
 			bitmap[y][x] = color;
 
+			/* add neighboring pixel positions */
 			PUSH(x + 1, y);
 			PUSH(x - 1, y);
 			PUSH(x, y + 1);
@@ -385,25 +392,28 @@ void tool_fill(int x, int y, eui_color_t color)
 		}
 	}
 
-	clicked = EUI_TRUE;
+	/* done */
+	started = EUI_TRUE;
 }
 #undef PUSH
 #undef POP
 
-/* plot color on tilemap */
+/* plot pixel on bitmap */
 void tool_pen(int x, int y, eui_color_t color)
 {
+	/* user is not pressing any buttons */
 	if (!eui_get_button())
 		return;
 
+	/* right click erases */
 	if (eui_get_button() & EUI_BUTTON_RIGHT)
 		color = 0;
 
-	/* plot color */
+	/* plot pixel */
 	bitmap[y][x] = color;
 }
 
-/* draw hollow rectangle on tilemap */
+/* draw hollow rectangle on bitmap */
 void tool_rect(int x, int y, eui_color_t color)
 {
 	static eui_vec2_t startpos;
@@ -412,46 +422,53 @@ void tool_rect(int x, int y, eui_color_t color)
 	int xx, yy;
 	int xsgn, ysgn;
 
+	/* user is not pressing a button */
 	if (!eui_get_button())
 	{
-		/* write changes */
+		/* we've already staretd drawing, so write changes */
 		if (started)
 		{
-			for (yy = 0; yy < MAP_HEIGHT; yy++)
+			/* write changes to bitmap */
+			for (yy = 0; yy < BITMAP_HEIGHT; yy++)
 			{
-				for (xx = 0; xx < MAP_WIDTH; xx++)
+				for (xx = 0; xx < BITMAP_WIDTH; xx++)
 				{
 					if (templayer[yy][xx] >= 0)
 						bitmap[yy][xx] = templayer[yy][xx];
 				}
 			}
 
+			/* no longer started */
 			started = EUI_FALSE;
 		}
 
 		/* clear temp layer */
 		memset(templayer, -1, sizeof(templayer));
-
 		return;
 	}
 
+	/* right click erases */
 	if (eui_get_button() & EUI_BUTTON_RIGHT)
 		color = 0;
 
+	/* already started drawing */
 	if (started)
 	{
+		/* set endpos */
 		endpos.x = x;
 		endpos.y = y;
 
+		/* get draw direction for lines */
 		xsgn = SGN(endpos.x - startpos.x);
 		ysgn = SGN(endpos.y - startpos.y);
 
+		/* clear temp layer */
 		memset(templayer, -1, sizeof(templayer));
 
 		/* vertical lines */
 		for (yy = startpos.y; yy != endpos.y; yy += ysgn)
 		{
-			if (yy < 0 || yy >= MAP_HEIGHT)
+			if (yy < 0 || yy >= BITMAP_HEIGHT)
 				break;
 			templayer[yy][startpos.x] = color;
 			templayer[yy][endpos.x] = color;
@@ -460,7 +477,7 @@ void tool_rect(int x, int y, eui_color_t color)
 		/* horizontal lines */
 		for (xx = startpos.x; xx != endpos.x; xx += xsgn)
 		{
-			if (xx < 0 || xx >= MAP_WIDTH)
+			if (xx < 0 || xx >= BITMAP_WIDTH)
 				break;
 			templayer[startpos.y][xx] = color;
 			templayer[endpos.y][xx] = color;
@@ -471,8 +488,11 @@ void tool_rect(int x, int y, eui_color_t color)
 	}
 	else
 	{
+		/* set startpos */
 		startpos.x = x;
 		startpos.y = y;
+
+		/* user started drawing */
 		started = EUI_TRUE;
 	}
 }
@@ -483,12 +503,12 @@ int main(int argc, char **argv)
 	uint32_t format;
 	unsigned int rmask, gmask, bmask, amask;
 	int bpp;
-	eui_vec2_t tilemap_pos, tilemap_size;
+	eui_vec2_t bitmap_pos, bitmap_size;
 	eui_vec2_t cursor_pos;
-	eui_vec2_t selected_tile;
+	eui_vec2_t selected_pixel;
 	eui_vec2_t current_color_pos;
 	eui_vec2_t current_color_size;
-	eui_vec2_t tile_pos, tile_size;
+	eui_vec2_t pixel_pos, pixel_size;
 	eui_vec2_t palette_pos, palette_size, palette_entry_size;
 	eui_vec2_t pos, size;
 	SDL_Event event;
@@ -549,7 +569,7 @@ int main(int argc, char **argv)
 	blit_rect.w = WIDTH;
 	blit_rect.h = HEIGHT;
 
-	/* clear tilemap */
+	/* clear bitmap */
 	button_clear(NULL);
 
 	/* set default color */
@@ -578,12 +598,12 @@ int main(int argc, char **argv)
 			/* clear */
 			eui_clear(4);
 
-			/* tile grid background */
-			tilemap_size.x = TILE_WIDTH * MAP_WIDTH;
-			tilemap_size.y = TILE_HEIGHT * MAP_HEIGHT;
-			tilemap_pos.x = WIDTH - tilemap_size.x;
-			tilemap_pos.y = HEIGHT - tilemap_size.y;
-			eui_filled_box(tilemap_pos, tilemap_size, 0);
+			/* grid background */
+			bitmap_size.x = PIXEL_WIDTH * BITMAP_WIDTH;
+			bitmap_size.y = PIXEL_HEIGHT * BITMAP_HEIGHT;
+			bitmap_pos.x = WIDTH - bitmap_size.x;
+			bitmap_pos.y = HEIGHT - bitmap_size.y;
+			eui_filled_box(bitmap_pos, bitmap_size, 0);
 
 			/* get cursor pos */
 			cursor_pos = eui_get_cursor_pos();
@@ -593,8 +613,8 @@ int main(int argc, char **argv)
 			palette_entry_size.y = ENTRY_HEIGHT;
 			palette_size.x = palette_entry_size.x * 16;
 			palette_size.y = palette_entry_size.y * 16;
-			palette_pos.x = (tilemap_pos.x / 2) - (palette_size.x / 2);
-			palette_pos.y = tilemap_pos.y;
+			palette_pos.x = (bitmap_pos.x / 2) - (palette_size.x / 2);
+			palette_pos.y = bitmap_pos.y;
 			for (y = 0; y < 16; y++)
 			{
 				for (x = 0; x < 16; x++)
@@ -604,7 +624,7 @@ int main(int argc, char **argv)
 					pos.x = palette_pos.x + (x * palette_entry_size.x);
 					pos.y = palette_pos.y + (y * palette_entry_size.y);
 
-					/* draw tile entry */
+					/* draw palette entry */
 					eui_filled_box(pos, palette_entry_size, y * 16 + x);
 				}
 			}
@@ -640,7 +660,7 @@ int main(int argc, char **argv)
 				entry_size.x = palette_entry_size.x + 2;
 				entry_size.y = palette_entry_size.y + 2;
 
-				/* draw tile outline */
+				/* draw color outline */
 				eui_border_box(entry_pos, entry_size, 1, 255);
 
 				if (eui_get_button() & EUI_BUTTON_LEFT)
@@ -649,81 +669,81 @@ int main(int argc, char **argv)
 				}
 			}
 
-			/* draw tilemap */
-			tile_size.x = TILE_WIDTH;
-			tile_size.y = TILE_HEIGHT;
-			for (y = 0; y < MAP_HEIGHT; y++)
+			/* draw bitmap */
+			pixel_size.x = PIXEL_WIDTH;
+			pixel_size.y = PIXEL_HEIGHT;
+			for (y = 0; y < BITMAP_HEIGHT; y++)
 			{
-				for (x = 0; x < MAP_WIDTH; x++)
+				for (x = 0; x < BITMAP_WIDTH; x++)
 				{
-					/* tile pos */
-					tile_pos.x = tilemap_pos.x + (x * TILE_WIDTH);
-					tile_pos.y = tilemap_pos.y + (y * TILE_HEIGHT);
+					/* pixel pos */
+					pixel_pos.x = bitmap_pos.x + (x * PIXEL_WIDTH);
+					pixel_pos.y = bitmap_pos.y + (y * PIXEL_HEIGHT);
 
-					/* draw tile */
-					eui_filled_box(tile_pos, tile_size, bitmap[y][x]);
+					/* draw pixel */
+					eui_filled_box(pixel_pos, pixel_size, bitmap[y][x]);
 
 					/* temp layer value */
 					if (templayer[y][x] >= 0)
-						eui_filled_box(tile_pos, tile_size, templayer[y][x]);
+						eui_filled_box(pixel_pos, pixel_size, templayer[y][x]);
 				}
 			}
 
-			/* draw selected tile */
-			if (eui_is_hovered(tilemap_pos, tilemap_size))
+			/* draw selected pixel */
+			if (eui_is_hovered(bitmap_pos, bitmap_size))
 			{
-				/* tile size */
-				tile_size.x = TILE_WIDTH + 2;
-				tile_size.y = TILE_HEIGHT + 2;
+				/* pixel size */
+				pixel_size.x = PIXEL_WIDTH + 2;
+				pixel_size.y = PIXEL_HEIGHT + 2;
 
-				/* tile pos */
-				tile_pos.x = cursor_pos.x - tilemap_pos.x;
-				tile_pos.y = cursor_pos.y - tilemap_pos.y;
+				/* pixel pos */
+				pixel_pos.x = cursor_pos.x - bitmap_pos.x;
+				pixel_pos.y = cursor_pos.y - bitmap_pos.y;
 
-				/* selected tile */
-				selected_tile.x = (tile_pos.x - (tile_pos.x % TILE_WIDTH)) / TILE_WIDTH;
-				selected_tile.y = (tile_pos.y - (tile_pos.y % TILE_HEIGHT)) / TILE_HEIGHT;
+				/* selected pixel */
+				selected_pixel.x = (pixel_pos.x - (pixel_pos.x % PIXEL_WIDTH)) / PIXEL_WIDTH;
+				selected_pixel.y = (pixel_pos.y - (pixel_pos.y % PIXEL_HEIGHT)) / PIXEL_HEIGHT;
 
-				selected_tile.x = CLAMP(selected_tile.x, 0, MAP_WIDTH - 1);
-				selected_tile.y = CLAMP(selected_tile.y, 0, MAP_HEIGHT - 1);
+				selected_pixel.x = CLAMP(selected_pixel.x, 0, BITMAP_WIDTH - 1);
+				selected_pixel.y = CLAMP(selected_pixel.y, 0, BITMAP_HEIGHT - 1);
 
-				tile_pos.x = (selected_tile.x * TILE_WIDTH) + tilemap_pos.x;
-				tile_pos.y = (selected_tile.y * TILE_HEIGHT) + tilemap_pos.y;
+				pixel_pos.x = (selected_pixel.x * PIXEL_WIDTH) + bitmap_pos.x;
+				pixel_pos.y = (selected_pixel.y * PIXEL_HEIGHT) + bitmap_pos.y;
 
-				tile_pos.x -= 1;
-				tile_pos.y -= 1;
+				pixel_pos.x -= 1;
+				pixel_pos.y -= 1;
 
-				/* draw tile outline */
-				eui_border_box(tile_pos, tile_size, 1, 255);
+				/* draw pixel outline */
+				eui_border_box(pixel_pos, pixel_size, 1, 255);
 
-				/* draw selected tile */
-				eui_textf(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 20), 31, "tile=%02dx%02d", selected_tile.x, selected_tile.y);
-				eui_textf(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 31, "color=%03d", bitmap[selected_tile.y][selected_tile.x]);
+				/* draw help text */
+				eui_textf(EUI_VEC2(bitmap_pos.x, bitmap_pos.y - 20), 31, "pixel=%02dx%02d", selected_pixel.x, selected_pixel.y);
+				eui_textf(EUI_VEC2(bitmap_pos.x, bitmap_pos.y - 10), 31, "color=%03d", bitmap[selected_pixel.y][selected_pixel.x]);
 
-				/* do tile interaction */
+				/* do pixel interaction */
 				switch (current_tool)
 				{
 					case TOOL_PEN:
-						tool_pen(selected_tile.x, selected_tile.y, current_color);
+						tool_pen(selected_pixel.x, selected_pixel.y, current_color);
 						break;
 
 					case TOOL_FILL:
-						tool_fill(selected_tile.x, selected_tile.y, current_color);
+						tool_fill(selected_pixel.x, selected_pixel.y, current_color);
 						break;
 
 					case TOOL_RECT:
-						tool_rect(selected_tile.x, selected_tile.y, current_color);
+						tool_rect(selected_pixel.x, selected_pixel.y, current_color);
 						break;
 				}
 			}
 			else
 			{
-				/* draw selected tile */
-				eui_text(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 20), 31, "tile=--x--");
-				eui_text(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 31, "color=---");
+				/* draw help text */
+				eui_text(EUI_VEC2(bitmap_pos.x, bitmap_pos.y - 20), 31, "pixel=--x--");
+				eui_text(EUI_VEC2(bitmap_pos.x, bitmap_pos.y - 10), 31, "color=---");
 
-			/* clear temp layer */
-			memset(templayer, -1, sizeof(templayer));
+				/* clear temp layer */
+				memset(templayer, -1, sizeof(templayer));
 			}
 
 			/* move to top left alignment */
@@ -731,7 +751,7 @@ int main(int argc, char **argv)
 
 			/* rect button */
 			pos.x = -4;
-			pos.y = (tilemap_pos.y / 2) - (rect_height / 2);
+			pos.y = (bitmap_pos.y / 2) - (rect_height / 2);
 			size.x = rect_width;
 			size.y = rect_height;
 			if (current_tool == TOOL_RECT)
@@ -745,7 +765,7 @@ int main(int argc, char **argv)
 
 			/* bucket button */
 			pos.x = -1 * bucket_width - 8;
-			pos.y = (tilemap_pos.y / 2) - (pen_height / 2);
+			pos.y = (bitmap_pos.y / 2) - (pen_height / 2);
 			size.x = bucket_width;
 			size.y = bucket_height;
 			if (current_tool == TOOL_FILL)
@@ -759,7 +779,7 @@ int main(int argc, char **argv)
 
 			/* pen button */
 			pos.x = -1 * (pen_width * 2) - 12;
-			pos.y = (tilemap_pos.y / 2) - (pen_height / 2);
+			pos.y = (bitmap_pos.y / 2) - (pen_height / 2);
 			size.x = pen_width;
 			size.y = pen_height;
 			if (current_tool == TOOL_PEN)
@@ -777,19 +797,19 @@ int main(int argc, char **argv)
 			/* clear button */
 			pos.x = 0;
 			pos.y = -24;
-			size.x = tilemap_pos.x;
+			size.x = bitmap_pos.x;
 			size.y = 24;
 			eui_button(pos, size, "Clear", button_clear, NULL);
 
 			/* save button */
 			pos.x = 0;
 			pos.y = 0;
-			size.x = tilemap_pos.x / 2;
+			size.x = bitmap_pos.x / 2;
 			size.y = 24;
 			eui_button(pos, size, "Save", button_save, NULL);
 
 			/* load button */
-			pos.x = tilemap_pos.x - size.x;
+			pos.x = bitmap_pos.x - size.x;
 			pos.y = 0;
 			eui_button(pos, size, "Load", button_load, NULL);
 
