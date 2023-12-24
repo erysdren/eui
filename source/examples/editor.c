@@ -43,6 +43,7 @@ SOFTWARE.
 #define BITMAP_HEIGHT (64)
 #define ENTRY_WIDTH (11)
 #define ENTRY_HEIGHT (11)
+#define MAX_UNDOS (16)
 
 #ifndef MIN
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
@@ -202,6 +203,9 @@ static unsigned char filled_rect_selected_bits[] = {
 
 /* bitmap */
 static uint8_t bitmap[BITMAP_HEIGHT][BITMAP_WIDTH];
+static uint8_t bitmap_history[MAX_UNDOS][BITMAP_HEIGHT][BITMAP_WIDTH];
+static int current_bitmap = 0;
+static int top_bitmap = 1;
 
 /* temp layer */
 int templayer[BITMAP_HEIGHT][BITMAP_WIDTH];
@@ -228,13 +232,88 @@ static SDL_Rect blit_rect;
 static SDL_bool running;
 static SDL_Color colors[256];
 
+/* push bitmap to stack */
+void bitmap_push(int redo)
+{
+	int i;
+
+	/* it's a redo, not an edit */
+	if (redo)
+	{
+		/* already at the top of the stack */
+		if (current_bitmap >= top_bitmap)
+			return;
+
+		printf("PUSH REDO: current_bitmap=%d top_bitmap=%d\n", current_bitmap, top_bitmap);
+
+		/* move to next bitmap */
+		current_bitmap++;
+		return;
+	}
+
+	if (current_bitmap == MAX_UNDOS - 1)
+	{
+		/* move bitmap stack down */
+		for (i = 0; i < current_bitmap; i++)
+		{
+			memcpy(&bitmap_history[i], &bitmap_history[i + 1], sizeof(bitmap_history[i]));
+		}
+	}
+	else
+	{
+		/* move to next bitmap */
+		current_bitmap++;
+
+		/* clear upper bitmap stack */
+		for (i = current_bitmap; i < MAX_UNDOS; i++)
+		{
+			memset(&bitmap_history[i], 0, sizeof(bitmap_history[i]));
+		}
+	}
+
+	/* copy current bitmap to next in stack */
+	memcpy(&bitmap_history[current_bitmap], bitmap, sizeof(bitmap));
+
+	top_bitmap = current_bitmap;
+	printf("PUSH EDIT: current_bitmap=%d top_bitmap=%d\n", current_bitmap, top_bitmap);
+}
+
+/* pop bitmap from stack */
+void bitmap_pop(void)
+{
+	if (!current_bitmap)
+		return;
+
+	current_bitmap--;
+
+	printf("POP: current_bitmap=%d top_bitmap=%d\n", current_bitmap, top_bitmap);
+}
+
+/* undo button */
+void button_undo(void *user)
+{
+	EUI_UNUSED(user);
+	bitmap_pop();
+	memcpy(bitmap, &bitmap_history[current_bitmap], sizeof(bitmap));
+}
+
+/* redo button */
+void button_redo(void *user)
+{
+	EUI_UNUSED(user);
+	bitmap_push(EUI_TRUE);
+	memcpy(bitmap, &bitmap_history[current_bitmap], sizeof(bitmap));
+}
+
 /* clear button */
 void button_clear(void *user)
 {
 	EUI_UNUSED(user);
 
-	memset(bitmap, 0, sizeof(bitmap));
+	memset(&bitmap, 0, sizeof(bitmap));
 	memset(templayer, -1, sizeof(templayer));
+
+	bitmap_push(EUI_FALSE);
 }
 
 /* save button */
@@ -360,7 +439,15 @@ void tool_fill(int x, int y, eui_color_t color)
 	/* user is not pressing any buttons */
 	if (!eui_get_button())
 	{
-		started = EUI_FALSE;
+		if (started)
+		{
+			/* push bitmap stack for undo/redo */
+			bitmap_push(EUI_FALSE);
+
+			/* turn off started flag */
+			started = EUI_FALSE;
+		}
+
 		return;
 	}
 
@@ -410,7 +497,7 @@ void tool_fill(int x, int y, eui_color_t color)
 		}
 	}
 
-	/* done */
+	/* we're doing it */
 	started = EUI_TRUE;
 }
 #undef PUSH
@@ -419,9 +506,22 @@ void tool_fill(int x, int y, eui_color_t color)
 /* plot pixel on bitmap */
 void tool_pen(int x, int y, eui_color_t color)
 {
+	static int started;
+
 	/* user is not pressing any buttons */
 	if (!eui_get_button())
+	{
+		if (started)
+		{
+			/* push bitmap stack for undo/redo */
+			bitmap_push(EUI_FALSE);
+
+			/* turn off started flag */
+			started = EUI_FALSE;
+		}
+
 		return;
+	}
 
 	/* right click erases */
 	if (eui_get_button() & EUI_BUTTON_RIGHT)
@@ -429,6 +529,9 @@ void tool_pen(int x, int y, eui_color_t color)
 
 	/* plot pixel */
 	bitmap[y][x] = color;
+
+	/* we're doing it */
+	started = EUI_TRUE;
 }
 
 /* draw hollow rectangle on bitmap */
@@ -456,7 +559,10 @@ void tool_rect(int x, int y, eui_color_t color)
 				}
 			}
 
-			/* no longer started */
+			/* push bitmap stack for undo/redo */
+			bitmap_push(EUI_FALSE);
+
+			/* turn off started flag */
 			started = EUI_FALSE;
 		}
 
@@ -539,7 +645,10 @@ void tool_filled_rect(int x, int y, eui_color_t color)
 				}
 			}
 
-			/* no longer started */
+			/* push bitmap stack for undo/redo */
+			bitmap_push(EUI_FALSE);
+
+			/* turn off started flag */
 			started = EUI_FALSE;
 		}
 
@@ -683,7 +792,8 @@ int main(int argc, char **argv)
 	blit_rect.h = HEIGHT;
 
 	/* clear bitmap */
-	button_clear(NULL);
+	memset(&bitmap, 0, sizeof(bitmap));
+	memset(templayer, -1, sizeof(templayer));
 
 	/* set default color */
 	current_color = 63;
@@ -934,6 +1044,18 @@ int main(int argc, char **argv)
 
 			/* move to bottom alignment */
 			eui_set_align(EUI_ALIGN_START, EUI_ALIGN_END);
+
+			/* undo button */
+			pos.x = 0;
+			pos.y = -48;
+			size.x = bitmap_pos.x / 2;
+			size.y = 24;
+			eui_button(pos, size, "Undo", button_undo, NULL);
+
+			/* redo button */
+			pos.x = bitmap_pos.x - size.x;
+			pos.y = -48;
+			eui_button(pos, size, "Redo", button_redo, NULL);
 
 			/* clear button */
 			pos.x = 0;
