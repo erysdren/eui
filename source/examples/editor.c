@@ -492,7 +492,7 @@ int main(int argc, char **argv)
 	while (running)
 	{
 		/* parse sdl events */
-		while (SDL_PollEvent(&event))
+		if (SDL_WaitEvent(&event) != 0)
 		{
 			eui_push_event_sdl2(&event);
 
