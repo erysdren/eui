@@ -231,6 +231,10 @@ void button_save(void *user)
 
 	filename = tinyfd_saveFileDialog("Save BMP", "image.bmp", 1, filter_patterns, "BMP Files");
 
+	SDL_PumpEvents();
+	SDL_FlushEvents(SDL_MOUSEMOTION, SDL_MOUSEWHEEL);
+	eui_clear_events();
+
 	if (filename == NULL)
 		return;
 
@@ -273,6 +277,10 @@ void button_load(void *user)
 	EUI_UNUSED(user);
 
 	filename = tinyfd_openFileDialog("Load BMP", "image.bmp", 1, filter_patterns, "BMP Files", 0);
+
+	SDL_PumpEvents();
+	SDL_FlushEvents(SDL_MOUSEMOTION, SDL_MOUSEWHEEL);
+	eui_clear_events();
 
 	if (filename == NULL)
 		return;

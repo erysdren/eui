@@ -265,6 +265,9 @@ void eui_push_event(eui_event_t event);
 /* pop event from the top of the queue */
 int eui_pop_event(eui_event_t *out);
 
+/* clear event queue */
+void eui_clear_events(void);
+
 /* push key to the queue */
 void eui_push_key(int scancode);
 

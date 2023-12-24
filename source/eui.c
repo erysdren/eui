@@ -475,6 +475,8 @@ void eui_push_event(eui_event_t event)
 		return;
 	}
 
+	printf("EVENT ADDED! event_type=%d num_events=%d\n", event.type, num_events);
+
 	events[++num_events] = event;
 }
 
@@ -491,6 +493,18 @@ int eui_pop_event(eui_event_t *out)
 	num_events--;
 
 	return num_events + 1;
+}
+
+/* clear event queue */
+void eui_clear_events(void)
+{
+	num_events = 0;
+	memset(events, 0, sizeof(events));
+	mouse.x = 0;
+	mouse.y = 0;
+	button = 0;
+	memset(keys, 0, sizeof(keys));
+	memset(key_buffer, 0, sizeof(key_buffer));
 }
 
 /* push key to the queue */
