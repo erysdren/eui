@@ -212,6 +212,7 @@ typedef void eui_callback(void *user);
  *
  */
 
+/* unused */
 #define EUI_UNUSED(x) ((void)(x))
 
 /* create vec2 */
