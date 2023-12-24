@@ -39,7 +39,8 @@ SOFTWARE.
 #define TILE_HEIGHT (7)
 #define MAP_WIDTH (64)
 #define MAP_HEIGHT (64)
-
+#define ENTRY_WIDTH (11)
+#define ENTRY_HEIGHT (11)
 
 #ifndef MIN
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
@@ -127,6 +128,7 @@ static struct {
 } tilemap;
 
 static int current_layer = 0;
+static eui_color_t current_color = 1;
 
 static SDL_Window *window;
 static SDL_Surface *surface8;
@@ -147,8 +149,10 @@ int main(int argc, char **argv)
 	eui_vec2_t cursor_pos;
 	eui_vec2_t selected_tile;
 	eui_vec2_t tile_pos, tile_size;
+	eui_vec2_t palette_pos, palette_size, palette_entry_size;
 	SDL_Event event;
 	int i;
+	int x, y;
 
 	EUI_UNUSED(argc);
 	EUI_UNUSED(argv);
@@ -240,26 +244,72 @@ int main(int argc, char **argv)
 			/* get cursor pos */
 			cursor_pos = eui_get_cursor_pos();
 
-			/* draw tilemap */
-			if (current_layer == 0)
+			/* draw palette */
+			palette_entry_size.x = ENTRY_WIDTH;
+			palette_entry_size.y = ENTRY_HEIGHT;
+			palette_size.x = palette_entry_size.x * 16;
+			palette_size.y = palette_entry_size.y * 16;
+			palette_pos.x = (tilemap_pos.x / 2) - (palette_size.x / 2);
+			palette_pos.y = tilemap_pos.y;
+			for (y = 0; y < 16; y++)
 			{
-				int x, y;
-
-				/* tile size */
-				tile_size.x = TILE_WIDTH + 2;
-				tile_size.y = TILE_HEIGHT + 2;
-
-				for (y = 0; y < MAP_HEIGHT; y++)
+				for (x = 0; x < 16; x++)
 				{
-					for (x = 0; x < MAP_WIDTH; x++)
-					{
-						/* tile pos */
-						tile_pos.x = tilemap_pos.x + (x * TILE_WIDTH);
-						tile_pos.y = tilemap_pos.y + (y * TILE_HEIGHT);
+					eui_vec2_t pos;
 
-						/* draw tile */
-						eui_filled_box(tile_pos, tile_size, tilemap.walls[y][x]);
-					}
+					pos.x = palette_pos.x + (x * palette_entry_size.x);
+					pos.y = palette_pos.y + (y * palette_entry_size.y);
+
+					/* draw tile entry */
+					eui_filled_box(pos, palette_entry_size, y * 16 + x);
+				}
+			}
+
+			/* draw selected color */
+			eui_textf(EUI_VEC2(palette_pos.x, palette_pos.y - 10), 15, "color=%02d", current_color);
+
+			/* do color interaction */
+			if (eui_is_hovered(palette_pos, palette_size))
+			{
+				eui_vec2_t entry_pos, entry_size, selected_color;
+
+				entry_pos.x = cursor_pos.x - palette_pos.x;
+				entry_pos.y = cursor_pos.y - palette_pos.y;
+
+				selected_color.x = (entry_pos.x - (entry_pos.x % ENTRY_WIDTH)) / ENTRY_WIDTH;
+				selected_color.y = (entry_pos.y - (entry_pos.y % ENTRY_HEIGHT)) / ENTRY_HEIGHT;
+
+				entry_pos.x = (selected_color.x * ENTRY_WIDTH) + palette_pos.x;
+				entry_pos.y = (selected_color.y * ENTRY_HEIGHT) + palette_pos.y;
+
+				entry_pos.x -= 1;
+				entry_pos.y -= 1;
+
+				entry_size.x = palette_entry_size.x + 2;
+				entry_size.y = palette_entry_size.y + 2;
+
+				/* draw tile outline */
+				eui_border_box(entry_pos, entry_size, 1, 255);
+
+				if (eui_get_button() & EUI_BUTTON_LEFT)
+				{
+					current_color = selected_color.y * 16 + selected_color.x;
+				}
+			}
+
+			/* draw tilemap */
+			tile_size.x = TILE_WIDTH;
+			tile_size.y = TILE_HEIGHT;
+			for (y = 0; y < MAP_HEIGHT; y++)
+			{
+				for (x = 0; x < MAP_WIDTH; x++)
+				{
+					/* tile pos */
+					tile_pos.x = tilemap_pos.x + (x * TILE_WIDTH);
+					tile_pos.y = tilemap_pos.y + (y * TILE_HEIGHT);
+
+					/* draw tile */
+					eui_filled_box(tile_pos, tile_size, tilemap.walls[y][x]);
 				}
 			}
 
@@ -291,18 +341,18 @@ int main(int argc, char **argv)
 				eui_border_box(tile_pos, tile_size, 1, 63);
 
 				/* draw selected tile */
-				eui_textf(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 15, "x=%02d y=%02d", selected_tile.x, selected_tile.y);
+				eui_textf(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 15, "tile=%02dx%02d", selected_tile.x, selected_tile.y);
 
 				/* do tile interaction */
 				if (eui_get_button() & EUI_BUTTON_LEFT)
-					tilemap.walls[selected_tile.y][selected_tile.x] = 255;
+					tilemap.walls[selected_tile.y][selected_tile.x] = current_color;
 				else if (eui_get_button() & EUI_BUTTON_RIGHT)
 					tilemap.walls[selected_tile.y][selected_tile.x] = 0;
 			}
 			else
 			{
 				/* draw selected tile */
-				eui_text(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 15, "x=na y=na");
+				eui_text(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 15, "tile=--x--");
 			}
 
 			/* end eui */
