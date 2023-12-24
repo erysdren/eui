@@ -244,8 +244,6 @@ void bitmap_push(int redo)
 		if (current_bitmap >= top_bitmap)
 			return;
 
-		printf("PUSH REDO: current_bitmap=%d top_bitmap=%d\n", current_bitmap, top_bitmap);
-
 		/* move to next bitmap */
 		current_bitmap++;
 		return;
@@ -272,10 +270,8 @@ void bitmap_push(int redo)
 	}
 
 	/* copy current bitmap to next in stack */
-	memcpy(&bitmap_history[current_bitmap], bitmap, sizeof(bitmap));
-
 	top_bitmap = current_bitmap;
-	printf("PUSH EDIT: current_bitmap=%d top_bitmap=%d\n", current_bitmap, top_bitmap);
+	memcpy(&bitmap_history[current_bitmap], bitmap, sizeof(bitmap));
 }
 
 /* pop bitmap from stack */
@@ -284,10 +280,7 @@ void bitmap_pop(void)
 	if (!current_bitmap)
 		return;
 
-	current_bitmap--;
-
-	printf("POP: current_bitmap=%d top_bitmap=%d\n", current_bitmap, top_bitmap);
-}
+	current_bitmap--;}
 
 /* undo button */
 void button_undo(void *user)
