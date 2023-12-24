@@ -149,7 +149,7 @@ void button_save(void *user)
 
 	EUI_UNUSED(user);
 
-	filename = tinyfd_saveFileDialog("Save Drawing", "map.dat", 0, NULL, NULL);
+	filename = tinyfd_saveFileDialog("Save Map", "map.dat", 0, NULL, NULL);
 
 	if (filename == NULL)
 		return;
@@ -167,7 +167,7 @@ void button_load(void *user)
 
 	EUI_UNUSED(user);
 
-	filename = tinyfd_openFileDialog("Save Drawing", "map.dat", 0, NULL, NULL, 0);
+	filename = tinyfd_openFileDialog("Load Map", "map.dat", 0, NULL, NULL, 0);
 
 	if (filename == NULL)
 		return;
