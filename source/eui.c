@@ -1049,12 +1049,12 @@ void eui_xbm(eui_vec2_t pos, eui_color_t color, int w, int h, unsigned char *bit
 	eui_transform_box(&pos, size);
 
 	/* draw graphic */
-	pitch = w + (8 % w) - (w % 8);
+	pitch = w / 8 + ((w % 8) ? 1 : 0);
 	for (y = 0; y < h; y++)
 	{
 		for (x = 0; x < w; x++)
 		{
-			if (bitmap[(y * pitch + x) / 8] & 1 << (x % 8))
+			if (bitmap[y * pitch + (x / 8)] & 1 << (x % 8))
 			{
 				xx = pos.x + x;
 				yy = pos.y + y;
