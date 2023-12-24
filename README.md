@@ -1,7 +1,7 @@
 
 # EUI
 
-![EUI Example](./.github/eui.png "EUI Example")
+![EUI Example](./.github/snonk.png "EUI Example")
 
 EUI is a small UI and drawing library designed for homebrew games, debug UIs, embedded systems, and low resolution or low color depth displays.
 
@@ -16,8 +16,21 @@ While CMake is used to build the test programs, it is not required for EUI itsel
 
 ## Source Code Guide
 
+### Main Files
+
 - [`eui.c`](./source/eui.c) & [`eui.h`](./source/eui.h): Main platform agnostic EUI library.
 - [`eui_sdl2.c`](./source/eui_sdl2.c) & [`eui_sdl2.h`](./source/eui_sdl2.h): Helper functions for integration with SDL2.
+
+### Examples
+
+- [`editor.c`](./source/examples/editor.c): Small image editor with the SDL2 backend.
+
+### Tests
+
+- [`basic.c`](./source/tests/basic.c): Render a single frame with a button.
+- [`dos32.c`](./source/tests/dos32.c): Handle a button and mouse input on MS-DOS.
+- [`sdl2_01.c`](./source/tests/sdl2_01.c): Handle a button and mouse input on SDL2.
+- [`sdl2_02.c`](./source/tests/sdl2_02.c): Borderless window with button.
 
 ## Tested Compilers & Platforms
 
