@@ -141,6 +141,14 @@ static SDL_Rect blit_rect;
 static SDL_bool running;
 static SDL_Color colors[256];
 
+/* clear button */
+void button_clear(void *user)
+{
+	EUI_UNUSED(user);
+
+	memset(&tilemap, 0, sizeof(tilemap));
+}
+
 /* save button */
 void button_save(void *user)
 {
@@ -305,7 +313,7 @@ int main(int argc, char **argv)
 			}
 
 			/* draw selected color */
-			eui_textf(EUI_VEC2(palette_pos.x, palette_pos.y - 10), 31, "color=%02d", current_color);
+			eui_textf(EUI_VEC2(palette_pos.x, palette_pos.y - 10), 31, "color=%03d", current_color);
 
 			/* do color interaction */
 			if (eui_is_hovered(palette_pos, palette_size))
@@ -381,7 +389,7 @@ int main(int argc, char **argv)
 
 				/* draw selected tile */
 				eui_textf(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 20), 31, "tile=%02dx%02d", selected_tile.x, selected_tile.y);
-				eui_textf(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 31, "color=%02d", tilemap.walls[selected_tile.y][selected_tile.x]);
+				eui_textf(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 31, "color=%03d", tilemap.walls[selected_tile.y][selected_tile.x]);
 
 				/* do tile interaction */
 				if (eui_get_button() & EUI_BUTTON_LEFT)
@@ -393,11 +401,18 @@ int main(int argc, char **argv)
 			{
 				/* draw selected tile */
 				eui_text(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 20), 31, "tile=--x--");
-				eui_text(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 31, "color=--");
+				eui_text(EUI_VEC2(tilemap_pos.x, tilemap_pos.y - 10), 31, "color=---");
 			}
 
 			/* move to bottom alignment */
 			eui_set_align(EUI_ALIGN_START, EUI_ALIGN_END);
+
+			/* clear button */
+			pos.x = 0;
+			pos.y = -24;
+			size.x = tilemap_pos.x;
+			size.y = 24;
+			eui_button(pos, size, "Clear", button_clear, NULL);
 
 			/* save button */
 			pos.x = 0;
