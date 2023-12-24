@@ -194,8 +194,6 @@ enum {
 };
 
 static int current_tool = TOOL_PEN;
-
-static int current_layer = 0;
 static eui_color_t current_color = 0;
 
 /* filter patterns for save/load dialogs */
@@ -630,7 +628,9 @@ int main(int argc, char **argv)
 			}
 
 			/* draw selected color */
-			eui_textf(EUI_VEC2(palette_pos.x, palette_pos.y - 10), 31, "color=%03d", current_color);
+			pos.x = palette_pos.x;
+			pos.y = palette_pos.y - 10;
+			eui_textf(pos, 31, "color=%03d", current_color);
 			current_color_pos.x = ((current_color % 16) * palette_entry_size.x) + palette_pos.x - 1;
 			current_color_pos.y = ((current_color / 16) * palette_entry_size.y) + palette_pos.y - 1;
 			current_color_size.x = palette_entry_size.x + 2;
@@ -717,8 +717,12 @@ int main(int argc, char **argv)
 				eui_border_box(pixel_pos, pixel_size, 1, 255);
 
 				/* draw help text */
-				eui_textf(EUI_VEC2(bitmap_pos.x, bitmap_pos.y - 20), 31, "pixel=%02dx%02d", selected_pixel.x, selected_pixel.y);
-				eui_textf(EUI_VEC2(bitmap_pos.x, bitmap_pos.y - 10), 31, "color=%03d", bitmap[selected_pixel.y][selected_pixel.x]);
+				pos.x = bitmap_pos.x;
+				pos.y = bitmap_pos.y - 20;
+				eui_textf(pos, 31, "pixel=%02dx%02d", selected_pixel.x, selected_pixel.y);
+				pos.x = bitmap_pos.x;
+				pos.y = bitmap_pos.y - 10;
+				eui_textf(pos, 31, "color=%03d", bitmap[selected_pixel.y][selected_pixel.x]);
 
 				/* do pixel interaction */
 				switch (current_tool)
@@ -739,8 +743,12 @@ int main(int argc, char **argv)
 			else
 			{
 				/* draw help text */
-				eui_text(EUI_VEC2(bitmap_pos.x, bitmap_pos.y - 20), 31, "pixel=--x--");
-				eui_text(EUI_VEC2(bitmap_pos.x, bitmap_pos.y - 10), 31, "color=---");
+				pos.x = bitmap_pos.x;
+				pos.y = bitmap_pos.y - 20;
+				eui_text(pos, 31, "pixel=--x--");
+				pos.x = bitmap_pos.x;
+				pos.y = bitmap_pos.y - 10;
+				eui_text(pos, 31, "color=---");
 
 				/* clear temp layer */
 				memset(templayer, -1, sizeof(templayer));

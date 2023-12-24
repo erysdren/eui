@@ -4067,7 +4067,6 @@ static int osx9orBetter(void)
 static int python3Present(void)
 {
 		static int lPython3Present = -1 ;
-		int i;
 
 		if ( lPython3Present < 0 )
 		{
