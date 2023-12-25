@@ -1129,6 +1129,35 @@ int eui_button(eui_vec2_t pos, eui_vec2_t size, char *text, eui_callback callbac
 	return hovered;
 }
 
+/* fires callback function if pressed and returns EUI_TRUE if hovered (xbm graphic) */
+int eui_button_xbm(eui_vec2_t pos, int w, int h, unsigned char *bits, eui_callback callback, void *user)
+{
+	static int clicked;
+	int hovered;
+	eui_vec2_t size;
+
+	size.x = w;
+	size.y = h;
+
+	hovered = eui_is_hovered(pos, size);
+
+	if (hovered)
+		eui_xbm(pos, config.button.border_color_hover, w, h, bits);
+	else
+		eui_xbm(pos, config.button.border_color, w, h, bits);
+
+	if (hovered && button && !clicked)
+	{
+		callback(user);
+		clicked = EUI_TRUE;
+	}
+
+	if (!button)
+		clicked = EUI_FALSE;
+
+	return hovered;
+}
+
 /* on/off checkbox */
 void eui_checkbox(eui_vec2_t pos, char *label, eui_color_t color, int *value)
 {

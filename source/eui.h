@@ -359,6 +359,9 @@ void eui_xbm(eui_vec2_t pos, eui_color_t color, int w, int h, unsigned char *bit
 /* fires callback function if pressed and returns EUI_TRUE if hovered */
 int eui_button(eui_vec2_t pos, eui_vec2_t size, char *text, eui_callback callback, void *user);
 
+/* fires callback function if pressed and returns EUI_TRUE if hovered (xbm graphic) */
+int eui_button_xbm(eui_vec2_t pos, int w, int h, unsigned char *bits, eui_callback callback, void *user);
+
 /* on/off checkbox */
 void eui_checkbox(eui_vec2_t pos, char *label, eui_color_t color, int *value);
 
