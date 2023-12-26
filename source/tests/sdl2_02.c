@@ -101,12 +101,11 @@ int main(int argc, char **argv)
 	/* set window borderless */
 	SDL_SetWindowBordered(window, SDL_FALSE);
 
-	/* set window size */
-	SDL_SetWindowMinimumSize(window, WIDTH, HEIGHT);
-
 	/* create renderer */
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
 	SDL_RenderSetLogicalSize(renderer, WIDTH, HEIGHT);
+	SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
+	SDL_SetWindowMinimumSize(window, WIDTH, HEIGHT);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 	SDL_RenderPresent(renderer);
