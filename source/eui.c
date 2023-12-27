@@ -317,21 +317,17 @@ static inline void eui_set_pixel(eui_pixelmap_t pm, eui_vec2_t pos, eui_color_t 
 	ofs = pos.y * pm.pitch + (pos.x >> 3);
 	shift = 7 - (pos.x % 8);
 
+	/* set or clear bit at offset */
 	if (color)
-	{
-		/* set bit at offset */
 		pm.pixels[ofs] |= ((unsigned)1 << shift);
-	}
 	else
-	{
-		/* clear bit at offset */
 		pm.pixels[ofs] &= ~((unsigned)1 << shift);
-	}
 #elif EUI_PIXEL_DEPTH == 2
 	ofs = pos.y * pm.pitch + (pos.x >> 2);
-	shift = (pos.x % 4);
+	shift = 6 - (2 * (pos.x % 4));
+	mask = 0x3 << shift;
 
-	pm.pixels[ofs] |= (color << shift);
+	pm.pixels[ofs] = (pm.pixels[ofs] & ~mask) | ((color & 0x3) << shift);
 #elif EUI_PIXEL_DEPTH == 4
 	ofs = pos.y * pm.pitch + (pos.x >> 1);
 	shift = 4 - (4 * (pos.x % 2));
@@ -806,7 +802,27 @@ static void eui_filled_box_absolute(eui_vec2_t pos, eui_vec2_t size, eui_color_t
 				memset(ptr, 0x00, size.x / 8);
 		}
 #elif EUI_PIXEL_DEPTH == 2
+		eui_vec2_t p;
+		int x;
+		void *ptr;
 
+		if (pos.x % 4 || size.x % 4)
+		{
+			/* not aligned */
+			for (x = pos.x; x < pos.x + size.x; x++)
+			{
+				p.x = x;
+				p.y = y;
+				eui_set_pixel(drawdest, p, color);
+			}
+		}
+		else
+		{
+			/* aligned */
+			ptr = &drawdest.pixels[y * drawdest.pitch + (pos.x >> 2)];
+			color = color << 6 | color << 4 | color << 2 | color;
+			memset(ptr, color, size.x / 4);
+		}
 #elif EUI_PIXEL_DEPTH == 4
 		eui_vec2_t p;
 		int x;
@@ -826,7 +842,8 @@ static void eui_filled_box_absolute(eui_vec2_t pos, eui_vec2_t size, eui_color_t
 		{
 			/* aligned */
 			ptr = &drawdest.pixels[y * drawdest.pitch + (pos.x >> 1)];
-			memset(ptr, color << 4 | color, size.x / 2);
+			color = color << 4 | color;
+			memset(ptr, color, size.x / 2);
 		}
 #elif EUI_PIXEL_DEPTH == 8
 		memset(&drawdest.pixels[y * drawdest.pitch + pos.x], color, size.x);
