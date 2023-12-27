@@ -287,39 +287,20 @@ static eui_config_t config = {
  *
  */
 
-/* draw font8x8 bitmap at pos */
-static void eui_font8x8(eui_vec2_t pos, const unsigned char *bitmap, eui_color_t color)
-{
-	int x, y;
-	int xx, yy;
-
-	for (x = 0; x < 8; x++)
-	{
-		for (y = 0; y < 8; y++)
-		{
-			if (bitmap[x] & 1 << y)
-			{
-				xx = pos.x + y;
-				yy = pos.y + x;
-
-				if (xx < 0 || xx >= drawdest.w || yy < 0 || yy >= drawdest.h)
-					continue;
-
-				PIXEL(drawdest, xx, yy) = color;
-			}
-		}
-	}
-}
-
 /* place pixel at coordinate */
-static void eui_set_pixel(eui_pixelmap_t pm, eui_vec2_t pos, eui_color_t color)
+static inline void eui_set_pixel(eui_pixelmap_t pm, eui_vec2_t pos, eui_color_t color)
 {
-#if EUI_PIXEL_DEPTH == 1
 	unsigned long ofs;
 	unsigned int shift;
 
+	/* bounds check */
+	if (pos.x < 0 || pos.x >= pm.w)
+		return;
+	if (pos.y < 0 || pos.y >= pm.h)
+		return;
+#if EUI_PIXEL_DEPTH == 1
 	ofs = pos.y * pm.pitch + (pos.x >> 3);
-	shift = -1 * ((pos.x % 8) - 7);
+	shift = 7 - (pos.x % 8);
 
 	if (color)
 	{
@@ -332,19 +313,35 @@ static void eui_set_pixel(eui_pixelmap_t pm, eui_vec2_t pos, eui_color_t color)
 		pm.pixels[ofs] &= ~((unsigned)1 << shift);
 	}
 #elif EUI_PIXEL_DEPTH == 2
-	unsigned long ofs;
-	unsigned int shift;
-
 	ofs = pos.y * pm.pitch + (pos.x >> 2);
-
 #elif EUI_PIXEL_DEPTH == 4
-	unsigned long ofs;
-	unsigned int shift;
-
 	ofs = pos.y * pm.pitch + (pos.x >> 1);
 #else
-	pm.pixels[pos.y * pm.pitch + pos.x] = color;
+	ofs = pos.y * pm.pitch + pos.x;
+	EUI_UNUSED(shift);
+	pm.pixels[ofs] = color;
 #endif
+}
+
+/* draw font8x8 bitmap at pos */
+static void eui_font8x8(eui_vec2_t pos, const unsigned char *bitmap, eui_color_t color)
+{
+	int x, y;
+	eui_vec2_t temp;
+
+	for (x = 0; x < 8; x++)
+	{
+		for (y = 0; y < 8; y++)
+		{
+			if (bitmap[x] & 1 << y)
+			{
+				temp.x = pos.x + y;
+				temp.y = pos.y + x;
+
+				eui_set_pixel(drawdest, temp, color);
+			}
+		}
+	}
 }
 
 /*
@@ -760,7 +757,41 @@ static void eui_filled_box_absolute(eui_vec2_t pos, eui_vec2_t size, eui_color_t
 
 	for (y = pos.y; y < pos.y + size.y; y++)
 	{
-		memset(&PIXEL(drawdest, pos.x, y), color, size.x * sizeof(eui_color_t));
+#if EUI_PIXEL_DEPTH == 1
+		eui_vec2_t p;
+		int x;
+		void *ptr;
+
+		if (pos.x % 8 || size.x % 8)
+		{
+			/* not aligned */
+			for (x = pos.x; x < pos.x + size.x; x++)
+			{
+				p.x = x;
+				p.y = y;
+				eui_set_pixel(drawdest, p, color);
+			}
+		}
+		else
+		{
+			/* aligned */
+			ptr = &drawdest.pixels[y * drawdest.pitch + (pos.x >> 3)];
+			if (color)
+				memset(ptr, 0xFF, size.x / 8);
+			else
+				memset(ptr, 0x00, size.x / 8);
+		}
+#elif EUI_PIXEL_DEPTH == 2
+
+#elif EUI_PIXEL_DEPTH == 4
+
+#elif EUI_PIXEL_DEPTH == 8
+		memset(&drawdest.pixels[y * drawdest.pitch + pos.x], color, size.x);
+#else
+		int x;
+		for (x = pos.x; x < pos.x + size.x; x++)
+			drawdest.pixels[y * drawdest.pitch + x] = color;
+#endif
 	}
 }
 
@@ -949,6 +980,7 @@ void eui_filled_triangle(eui_vec2_t p0, eui_vec2_t p1, eui_vec2_t p2, eui_color_
 {
 	int x, y, len;
 	static int edge_table[MAX_HEIGHT][2];
+	eui_vec2_t temp;
 
 	/* init edge table */
 	for (y = 0; y < drawdest.h; y++)
@@ -974,9 +1006,11 @@ void eui_filled_triangle(eui_vec2_t p0, eui_vec2_t p1, eui_vec2_t p2, eui_color_
 			x = edge_table[y][0];
 			len = 1 + edge_table[y][1] - edge_table[y][0];
 
+			temp.y = y;
 			while (len--)
 			{
-				PIXEL(drawdest, x++, y) = color;
+				temp.x = x++;
+				eui_set_pixel(drawdest, temp, color);
 			}
 		}
 	}
@@ -985,7 +1019,8 @@ void eui_filled_triangle(eui_vec2_t p0, eui_vec2_t p1, eui_vec2_t p2, eui_color_
 /* draw line from p0 to p1, transformed */
 void eui_line(eui_vec2_t p0, eui_vec2_t p1, eui_color_t color)
 {
-	int i, dx, dy, sdx, sdy, dxabs, dyabs, x, y, px, py;
+	int i, dx, dy, sdx, sdy, dxabs, dyabs, x, y;
+	eui_vec2_t p;
 
 	/* transform points */
 	eui_transform_point(&p0);
@@ -1006,11 +1041,11 @@ void eui_line(eui_vec2_t p0, eui_vec2_t p1, eui_color_t color)
 	x = dyabs >> 1;
 	y = dxabs >> 1;
 
-	px = p0.x;
-	py = p0.y;
+	p.x = p0.x;
+	p.y = p0.y;
 
-	if (px >= 0 && px < drawdest.w && py >= 0 && py < drawdest.h)
-		PIXEL(drawdest, px, py) = color;
+	/* set first pixel */
+	eui_set_pixel(drawdest, p, color);
 
 	if (dxabs >= dyabs)
 	{
@@ -1022,17 +1057,17 @@ void eui_line(eui_vec2_t p0, eui_vec2_t p1, eui_color_t color)
 			if (y >= dxabs)
 			{
 				y -= dxabs;
-				py += sdy;
+				p.y += sdy;
 			}
 
-			px += sdx;
+			p.x += sdx;
 
-			if (px < 0 || px >= drawdest.w)
+			if (p.x < 0 || p.x >= drawdest.w)
 				continue;
-			if (py < 0 || py >= drawdest.h)
+			if (p.y < 0 || p.y >= drawdest.h)
 				continue;
 
-			PIXEL(drawdest, px, py) = color;
+			eui_set_pixel(drawdest, p, color);
 		}
 	}
 	else
@@ -1045,17 +1080,17 @@ void eui_line(eui_vec2_t p0, eui_vec2_t p1, eui_color_t color)
 			if ( x >= dyabs)
 			{
 				x -= dyabs;
-				px += sdx;
+				p.x += sdx;
 			}
 
-			py += sdy;
+			p.y += sdy;
 
-			if (px < 0 || px >= drawdest.w)
+			if (p.x < 0 || p.x >= drawdest.w)
 				continue;
-			if (py < 0 || py >= drawdest.h)
+			if (p.y < 0 || p.y >= drawdest.h)
 				continue;
 
-			PIXEL(drawdest, px, py) = color;
+			eui_set_pixel(drawdest, p, color);
 		}
 	}
 }
@@ -1120,9 +1155,6 @@ void eui_xbm(eui_vec2_t pos, eui_color_t color, int w, int h, unsigned char *bit
 			{
 				temp.x = pos.x + x;
 				temp.y = pos.y + y;
-
-				if (temp.x < 0 || temp.x >= drawdest.w || temp.y < 0 || temp.y >= drawdest.h)
-					continue;
 
 				eui_set_pixel(drawdest, temp, color);
 			}
