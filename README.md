@@ -56,8 +56,8 @@ While CMake is used to build the test and example programs, it is not required f
 
 - Optimize font, pixel, and horizontal line functions
 - Optimize sgn() macro
-- Support DOS ANSI text buffers
-- Support raw character buffers
+- Support VGA text buffers
+- Support raw text buffers
 - Abstract SDL2 and DOS backends and make tests/examples modular
 - Queued draw commands instead of immediate
 - Only redraw updated rectangles
