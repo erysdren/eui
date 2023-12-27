@@ -61,6 +61,7 @@ While CMake is used to build the test and example programs, it is not required f
 - Abstract SDL2 and DOS backends and make tests/examples modular
 - Queued draw commands instead of immediate
 - Only redraw updated rectangles
+- API Stablization and major cleanup
 
 ## Credits
 
