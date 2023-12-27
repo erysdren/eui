@@ -304,11 +304,6 @@ static void eui_set_pixel(eui_pixelmap_t pm, eui_vec2_t pos, eui_color_t color)
 {
 	unsigned int ofs, shift, mask;
 
-	/* bounds check */
-	if (pos.x < 0 || pos.x >= pm.w)
-		return;
-	if (pos.y < 0 || pos.y >= pm.h)
-		return;
 #if EUI_PIXEL_DEPTH == 1
 	ofs = pos.y * pm.pitch + (pos.x >> 3);
 	shift = 7 - (pos.x % 8);
@@ -344,7 +339,7 @@ static void eui_set_pixel(eui_pixelmap_t pm, eui_vec2_t pos, eui_color_t color)
 static void eui_font8x8(eui_vec2_t pos, const unsigned char *bitmap, eui_color_t color)
 {
 	int x, y;
-	eui_vec2_t temp;
+	eui_vec2_t p;
 
 	for (x = 0; x < 8; x++)
 	{
@@ -352,10 +347,15 @@ static void eui_font8x8(eui_vec2_t pos, const unsigned char *bitmap, eui_color_t
 		{
 			if (bitmap[x] & 1 << y)
 			{
-				temp.x = pos.x + y;
-				temp.y = pos.y + x;
+				p.x = pos.x + y;
+				p.y = pos.y + x;
 
-				eui_set_pixel(drawdest, temp, color);
+				if (p.x < 0 || p.x >= drawdest.w)
+					continue;
+				if (p.y < 0 || p.y >= drawdest.h)
+					continue;
+
+				eui_set_pixel(drawdest, p, color);
 			}
 		}
 	}
@@ -1038,7 +1038,7 @@ void eui_filled_triangle(eui_vec2_t p0, eui_vec2_t p1, eui_vec2_t p2, eui_color_
 {
 	int x, y, len;
 	static int edge_table[MAX_HEIGHT][2];
-	eui_vec2_t temp;
+	eui_vec2_t p;
 
 	/* init edge table */
 	for (y = 0; y < drawdest.h; y++)
@@ -1064,11 +1064,15 @@ void eui_filled_triangle(eui_vec2_t p0, eui_vec2_t p1, eui_vec2_t p2, eui_color_
 			x = edge_table[y][0];
 			len = 1 + edge_table[y][1] - edge_table[y][0];
 
-			temp.y = y;
+			p.y = y;
 			while (len--)
 			{
-				temp.x = x++;
-				eui_set_pixel(drawdest, temp, color);
+				p.x = x++;
+				if (p.x < 0 || p.x >= drawdest.w)
+					continue;
+				if (p.y < 0 || p.y >= drawdest.h)
+					continue;
+				eui_set_pixel(drawdest, p, color);
 			}
 		}
 	}
@@ -1103,7 +1107,8 @@ void eui_line(eui_vec2_t p0, eui_vec2_t p1, eui_color_t color)
 	p.y = p0.y;
 
 	/* set first pixel */
-	eui_set_pixel(drawdest, p, color);
+	if (!(p.x < 0 || p.x >= drawdest.w || p.y < 0 || p.y >= drawdest.h))
+		eui_set_pixel(drawdest, p, color);
 
 	if (dxabs >= dyabs)
 	{
@@ -1196,7 +1201,7 @@ void eui_xbm(eui_vec2_t pos, eui_color_t color, int w, int h, unsigned char *bit
 	int x, y;
 	int pitch;
 	eui_vec2_t size;
-	eui_vec2_t temp;
+	eui_vec2_t p;
 
 	/* transform */
 	size.x = w;
@@ -1211,10 +1216,15 @@ void eui_xbm(eui_vec2_t pos, eui_color_t color, int w, int h, unsigned char *bit
 		{
 			if (bitmap[y * pitch + (x / 8)] & 1 << (x % 8))
 			{
-				temp.x = pos.x + x;
-				temp.y = pos.y + y;
+				p.x = pos.x + x;
+				p.y = pos.y + y;
 
-				eui_set_pixel(drawdest, temp, color);
+				if (p.x < 0 || p.x >= drawdest.w)
+					continue;
+				if (p.y < 0 || p.y >= drawdest.h)
+					continue;
+
+				eui_set_pixel(drawdest, p, color);
 			}
 		}
 	}
