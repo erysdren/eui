@@ -38,7 +38,7 @@ enum {
 	EUI_ALIGN_END
 };
 
-/* true/false/unset */
+/* true/false */
 enum {
 	EUI_FALSE = 0,
 	EUI_TRUE = 1
