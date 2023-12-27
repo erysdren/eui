@@ -263,6 +263,18 @@ static eui_config_t config = {
 	/* button */
 	{0, 1, 1, 0, 0, 1, 1}
 };
+#elif (EUI_PIXEL_DEPTH == 2)
+/* assumes cga palette 1 */
+static eui_config_t config = {
+	/* button */
+	{0, 3, 3, 0, 0, 3, 1}
+};
+#elif (EUI_PIXEL_DEPTH == 4)
+/* assumes vga palette */
+static eui_config_t config = {
+	/* button */
+	{0, 15, 15, 0, 0, 15, 1}
+};
 #elif (EUI_PIXEL_DEPTH == 8)
 /* assumes vga palette */
 static eui_config_t config = {
@@ -292,6 +304,7 @@ static inline void eui_set_pixel(eui_pixelmap_t pm, eui_vec2_t pos, eui_color_t 
 {
 	unsigned long ofs;
 	unsigned int shift;
+	eui_color_t mask;
 
 	/* bounds check */
 	if (pos.x < 0 || pos.x >= pm.w)
@@ -299,6 +312,8 @@ static inline void eui_set_pixel(eui_pixelmap_t pm, eui_vec2_t pos, eui_color_t 
 	if (pos.y < 0 || pos.y >= pm.h)
 		return;
 #if EUI_PIXEL_DEPTH == 1
+	EUI_UNUSED(mask);
+
 	ofs = pos.y * pm.pitch + (pos.x >> 3);
 	shift = 7 - (pos.x % 8);
 
@@ -314,11 +329,19 @@ static inline void eui_set_pixel(eui_pixelmap_t pm, eui_vec2_t pos, eui_color_t 
 	}
 #elif EUI_PIXEL_DEPTH == 2
 	ofs = pos.y * pm.pitch + (pos.x >> 2);
+	shift = (pos.x % 4);
+
+	pm.pixels[ofs] |= (color << shift);
 #elif EUI_PIXEL_DEPTH == 4
 	ofs = pos.y * pm.pitch + (pos.x >> 1);
+	shift = 4 - (4 * (pos.x % 2));
+	mask = 0xF << shift;
+
+	pm.pixels[ofs] = (pm.pixels[ofs] & ~mask) | ((color & 0xF) << shift);
 #else
-	ofs = pos.y * pm.pitch + pos.x;
 	EUI_UNUSED(shift);
+	EUI_UNUSED(mask);
+	ofs = pos.y * pm.pitch + pos.x;
 	pm.pixels[ofs] = color;
 #endif
 }
@@ -711,10 +734,11 @@ int eui_is_hovered(eui_vec2_t pos, eui_vec2_t size)
 void eui_clear(eui_color_t color)
 {
 #if EUI_PIXEL_DEPTH == 1
-	if (color)
-		color = 0xFF;
-	else
-		color = 0x00;
+	color = color ? 0xFF : 0x00;
+#elif EUI_PIXEL_DEPTH == 2
+	color = color << 6 | color << 4 | color << 2 | color;
+#elif EUI_PIXEL_DEPTH == 4
+	color = color << 4 | color;
 #endif
 
 	memset(drawdest.pixels, color, drawdest.h * drawdest.pitch);
@@ -784,7 +808,26 @@ static void eui_filled_box_absolute(eui_vec2_t pos, eui_vec2_t size, eui_color_t
 #elif EUI_PIXEL_DEPTH == 2
 
 #elif EUI_PIXEL_DEPTH == 4
+		eui_vec2_t p;
+		int x;
+		void *ptr;
 
+		if (pos.x % 2 || size.x % 2)
+		{
+			/* not aligned */
+			for (x = pos.x; x < pos.x + size.x; x++)
+			{
+				p.x = x;
+				p.y = y;
+				eui_set_pixel(drawdest, p, color);
+			}
+		}
+		else
+		{
+			/* aligned */
+			ptr = &drawdest.pixels[y * drawdest.pitch + (pos.x >> 1)];
+			memset(ptr, color << 4 | color, size.x / 2);
+		}
 #elif EUI_PIXEL_DEPTH == 8
 		memset(&drawdest.pixels[y * drawdest.pitch + pos.x], color, size.x);
 #else

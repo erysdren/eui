@@ -161,6 +161,10 @@ enum {
 /* pixel color type */
 #if (EUI_PIXEL_DEPTH == 1)
 typedef uint8_t eui_color_t;
+#elif (EUI_PIXEL_DEPTH == 2)
+typedef uint8_t eui_color_t;
+#elif (EUI_PIXEL_DEPTH == 4)
+typedef uint8_t eui_color_t;
 #elif (EUI_PIXEL_DEPTH == 8)
 typedef uint8_t eui_color_t;
 #elif (EUI_PIXEL_DEPTH == 16)
