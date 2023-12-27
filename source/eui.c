@@ -306,7 +306,7 @@ static void eui_set_pixel(eui_pixelmap_t pm, eui_vec2_t pos, eui_color_t color)
 
 #if EUI_PIXEL_DEPTH == 1
 	ofs = pos.y * pm.pitch + (pos.x >> 3);
-	shift = 7 - (pos.x % 8);
+	shift = ~pos.x & 7;
 	mask = 0x1 << shift;
 
 	/* OR the color in at ofs */
