@@ -7,12 +7,14 @@ EUI is a small UI and drawing library designed for homebrew games, debug UIs, em
 
 The main EUI library is only two files, [`eui.c`](./source/eui.c) and [`eui.h`](./source/eui.h). To add EUI to your project, just clone the files into your source tree and compile.
 
-You must also define the `EUI_PIXEL_DEPTH` preprocessor macro. Valid values: 8, 16, 32.
-
-While CMake is used to build the test programs, it is not required for EUI itself.
+While CMake is used to build the test and example programs, it is not required for EUI itself.
 
 > [!WARNING]
 > EUI is *not* yet production-ready, and the API is still changing. Proceed with caution.
+
+## Configuration Switches
+
+- `EUI_PIXEL_DEPTH`: Set target pixel depth in bits. Valid values: 1, 2, 4, 8, 16, 32. (Required!)
 
 ## Source Code Guide
 
@@ -27,10 +29,13 @@ While CMake is used to build the test programs, it is not required for EUI itsel
 
 ### Tests
 
+- [`4colors.c`](./source/tests/4colors.c): Render a single frame with a button (2bpp).
 - [`basic.c`](./source/tests/basic.c): Render a single frame with a button.
 - [`dos32.c`](./source/tests/dos32.c): Handle a button and mouse input on MS-DOS.
 - [`sdl2_01.c`](./source/tests/sdl2_01.c): Handle a button and mouse input on SDL2.
 - [`sdl2_02.c`](./source/tests/sdl2_02.c): Borderless window with button.
+- [`sdl2_03.c`](./source/tests/sdl2_02.c): SDL2 1bpp test.
+- [`sdl2_04.c`](./source/tests/sdl2_02.c): SDL2 4bpp test.
 
 ## Tested Compilers & Platforms
 
@@ -38,6 +43,13 @@ While CMake is used to build the test programs, it is not required for EUI itsel
 - Clang (Linux)
 - Watcom (DOS16, DOS32)
 - TCC (Linux)
+
+## Todo
+
+- Optimize font, pixel, and horizontal line functions
+- Optimize sgn() macro
+- Support DOS ANSI buffers
+- Abstract SDL2 and DOS backends and make tests/examples modular
 
 ## Credits
 
