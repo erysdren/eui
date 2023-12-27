@@ -300,11 +300,9 @@ static eui_config_t config = {
  */
 
 /* place pixel at coordinate */
-static inline void eui_set_pixel(eui_pixelmap_t pm, eui_vec2_t pos, eui_color_t color)
+static void eui_set_pixel(eui_pixelmap_t pm, eui_vec2_t pos, eui_color_t color)
 {
-	unsigned long ofs;
-	unsigned int shift;
-	eui_color_t mask;
+	unsigned int ofs, shift, mask;
 
 	/* bounds check */
 	if (pos.x < 0 || pos.x >= pm.w)
@@ -312,31 +310,31 @@ static inline void eui_set_pixel(eui_pixelmap_t pm, eui_vec2_t pos, eui_color_t 
 	if (pos.y < 0 || pos.y >= pm.h)
 		return;
 #if EUI_PIXEL_DEPTH == 1
-	EUI_UNUSED(mask);
-
 	ofs = pos.y * pm.pitch + (pos.x >> 3);
 	shift = 7 - (pos.x % 8);
+	mask = 0x1 << shift;
 
-	/* set or clear bit at offset */
-	if (color)
-		pm.pixels[ofs] |= ((unsigned)1 << shift);
-	else
-		pm.pixels[ofs] &= ~((unsigned)1 << shift);
+	/* OR the color in at ofs */
+	pm.pixels[ofs] = (pm.pixels[ofs] & ~mask) | ((color & 0x1) << shift);
 #elif EUI_PIXEL_DEPTH == 2
 	ofs = pos.y * pm.pitch + (pos.x >> 2);
 	shift = 6 - (2 * (pos.x % 4));
 	mask = 0x3 << shift;
 
+	/* OR the color in at ofs */
 	pm.pixels[ofs] = (pm.pixels[ofs] & ~mask) | ((color & 0x3) << shift);
 #elif EUI_PIXEL_DEPTH == 4
 	ofs = pos.y * pm.pitch + (pos.x >> 1);
 	shift = 4 - (4 * (pos.x % 2));
 	mask = 0xF << shift;
 
+	/* OR the color in at ofs */
 	pm.pixels[ofs] = (pm.pixels[ofs] & ~mask) | ((color & 0xF) << shift);
 #else
 	EUI_UNUSED(shift);
 	EUI_UNUSED(mask);
+
+	/* set color value at ofs */
 	ofs = pos.y * pm.pitch + pos.x;
 	pm.pixels[ofs] = color;
 #endif
