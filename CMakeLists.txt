@@ -64,6 +64,15 @@ if(SDL2_FOUND)
 	target_compile_options(test_sdl2_02 PUBLIC ${EUI_COMPILE_OPTIONS})
 	target_include_directories(test_sdl2_02 PUBLIC ${PROJECT_SOURCE_DIR}/source)
 
+	add_executable(test_sdl2_03
+		${PROJECT_SOURCE_DIR}/source/tests/sdl2_03.c
+		${PROJECT_SOURCE_DIR}/source/eui.c
+		${PROJECT_SOURCE_DIR}/source/eui_sdl2.c)
+	target_link_libraries(test_sdl2_03 PUBLIC SDL2::Main)
+	target_compile_definitions(test_sdl2_03 PUBLIC EUI_PIXEL_DEPTH=1)
+	target_compile_options(test_sdl2_03 PUBLIC ${EUI_COMPILE_OPTIONS})
+	target_include_directories(test_sdl2_03 PUBLIC ${PROJECT_SOURCE_DIR}/source)
+
 	configure_file(${PROJECT_SOURCE_DIR}/data/vga.pal ${PROJECT_BINARY_DIR}/vga.pal COPYONLY)
 endif()
 

@@ -137,6 +137,8 @@ int eui_begin_sdl2(SDL_Surface *surface)
 {
 	eui_pixelmap_t dest;
 
+	if (EUI_PIXEL_DEPTH != surface->format->BitsPerPixel)
+		return EUI_FALSE;
 	if (sizeof(eui_color_t) != surface->format->BytesPerPixel)
 		return EUI_FALSE;
 

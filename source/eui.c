@@ -257,7 +257,13 @@ static int key_buffer_ridx = 0;
 static int key_buffer_widx = 0;
 
 /* configuration state */
-#if (EUI_PIXEL_DEPTH == 8)
+#if (EUI_PIXEL_DEPTH == 1)
+/* assumes black and white palette */
+static eui_config_t config = {
+	/* button */
+	{0, 1, 1, 0, 0, 1, 1}
+};
+#elif (EUI_PIXEL_DEPTH == 8)
 /* assumes vga palette */
 static eui_config_t config = {
 	/* button */
@@ -303,6 +309,42 @@ static void eui_font8x8(eui_vec2_t pos, const unsigned char *bitmap, eui_color_t
 			}
 		}
 	}
+}
+
+/* place pixel at coordinate */
+static void eui_set_pixel(eui_pixelmap_t pm, eui_vec2_t pos, eui_color_t color)
+{
+#if EUI_PIXEL_DEPTH == 1
+	unsigned long ofs;
+	unsigned int shift;
+
+	ofs = pos.y * pm.pitch + (pos.x >> 3);
+	shift = -1 * ((pos.x % 8) - 7);
+
+	if (color)
+	{
+		/* set bit at offset */
+		pm.pixels[ofs] |= ((unsigned)1 << shift);
+	}
+	else
+	{
+		/* clear bit at offset */
+		pm.pixels[ofs] &= ~((unsigned)1 << shift);
+	}
+#elif EUI_PIXEL_DEPTH == 2
+	unsigned long ofs;
+	unsigned int shift;
+
+	ofs = pos.y * pm.pitch + (pos.x >> 2);
+
+#elif EUI_PIXEL_DEPTH == 4
+	unsigned long ofs;
+	unsigned int shift;
+
+	ofs = pos.y * pm.pitch + (pos.x >> 1);
+#else
+	pm.pixels[pos.y * pm.pitch + pos.x] = color;
+#endif
 }
 
 /*
@@ -671,6 +713,13 @@ int eui_is_hovered(eui_vec2_t pos, eui_vec2_t size)
 /* clear screen with color */
 void eui_clear(eui_color_t color)
 {
+#if EUI_PIXEL_DEPTH == 1
+	if (color)
+		color = 0xFF;
+	else
+		color = 0x00;
+#endif
+
 	memset(drawdest.pixels, color, drawdest.h * drawdest.pitch);
 }
 
@@ -764,7 +813,7 @@ void eui_text(eui_vec2_t pos, eui_color_t color, char *s)
 	eui_vec2_t size;
 	int c;
 	int start_x;
-	size_t len = 0;
+	unsigned long len = 0;
 	char *ptr;
 
 	/* get text size */
@@ -1051,9 +1100,10 @@ void eui_pixelmap(eui_vec2_t pos, eui_pixelmap_t pixelmap)
 /* draw xbm graphic, transformed */
 void eui_xbm(eui_vec2_t pos, eui_color_t color, int w, int h, unsigned char *bitmap)
 {
-	int x, y, xx, yy;
+	int x, y;
 	int pitch;
 	eui_vec2_t size;
+	eui_vec2_t temp;
 
 	/* transform */
 	size.x = w;
@@ -1068,13 +1118,13 @@ void eui_xbm(eui_vec2_t pos, eui_color_t color, int w, int h, unsigned char *bit
 		{
 			if (bitmap[y * pitch + (x / 8)] & 1 << (x % 8))
 			{
-				xx = pos.x + x;
-				yy = pos.y + y;
+				temp.x = pos.x + x;
+				temp.y = pos.y + y;
 
-				if (xx < 0 || xx >= drawdest.w || yy < 0 || yy >= drawdest.h)
+				if (temp.x < 0 || temp.x >= drawdest.w || temp.y < 0 || temp.y >= drawdest.h)
 					continue;
 
-				PIXEL(drawdest, xx, yy) = color;
+				eui_set_pixel(drawdest, temp, color);
 			}
 		}
 	}
