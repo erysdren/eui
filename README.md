@@ -15,12 +15,12 @@ While CMake is used to build the test and example programs, it is not required f
 ## Configuration Switches
 
 - `EUI_PIXEL_DEPTH`: Set target pixel depth in bits. Valid values:
-	- 1: 1 bit per pixel, 2 monochrome colors.
-	- 2: 2 bits per pixel, 4 indexed colors.
-	- 4: 4 bits per pixel, 16 indexed colors.
-	- 8: 8 bits per pixel, 256 indexed colors.
-	- 16: 16 bits per pixel, "high color" (Usually RGB565).
-	- 32: 32 bits per pixel, "true color" (usually RGBA8888).
+	- `1` bit per pixel, 2 monochrome colors.
+	- `2` bits per pixel, 4 indexed colors.
+	- `4` bits per pixel, 16 indexed colors.
+	- `8` bits per pixel, 256 indexed colors.
+	- `16` bits per pixel, "high color" (Usually RGB565).
+	- `32` bits per pixel, "true color" (usually RGBA8888).
 
 ## Source Code Guide
 
