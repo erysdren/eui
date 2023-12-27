@@ -55,7 +55,7 @@ enum {
 	EUI_EVENT_NONE,
 	EUI_EVENT_KEY_DOWN,
 	EUI_EVENT_KEY_UP,
-	EUI_EVENT_MOUSE,
+	EUI_EVENT_CURSOR,
 	EUI_EVENT_BUTTON_DOWN,
 	EUI_EVENT_BUTTON_UP
 };
@@ -184,7 +184,7 @@ typedef struct eui_vec2_t {
 typedef union eui_event_t {
 	int type;
 	struct { int type; int scancode; } key;
-	struct { int type; int x; int y; int xrel; int yrel; } mouse;
+	struct { int type; int x; int y; int xrel; int yrel; } cursor;
 	struct { int type; int x; int y; int button; } button;
 } eui_event_t;
 
@@ -311,7 +311,7 @@ eui_config_t *eui_get_config(void);
 /* get dimensions of text string, with newlines */
 eui_vec2_t eui_get_text_size(char *s);
 
-/* returns EUI_TRUE if the mouse cursor is hovering over the given area */
+/* returns EUI_TRUE if the cursor is hovering over the given area */
 int eui_is_hovered(eui_vec2_t pos, eui_vec2_t size);
 
 /* clear screen with color */

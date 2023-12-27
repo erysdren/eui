@@ -244,7 +244,7 @@ static eui_event_t events[MAX_EVENTS] = {0};
 static int num_events = 0;
 
 /* input state */
-static eui_vec2_t mouse = {0};
+static eui_vec2_t cursor = {0};
 static int button = 0;
 
 /* keyboard state */
@@ -554,8 +554,8 @@ void eui_clear_events(void)
 {
 	num_events = 0;
 	memset(events, 0, sizeof(events));
-	mouse.x = 0;
-	mouse.y = 0;
+	cursor.x = 0;
+	cursor.y = 0;
 	button = 0;
 	memset(keys, 0, sizeof(keys));
 	memset(key_buffer, 0, sizeof(key_buffer));
@@ -628,9 +628,9 @@ int eui_begin(eui_pixelmap_t dest)
 				keys[event.key.scancode] = EUI_FALSE;
 				break;
 
-			case EUI_EVENT_MOUSE:
-				mouse.x = event.mouse.x;
-				mouse.y = event.mouse.y;
+			case EUI_EVENT_CURSOR:
+				cursor.x = event.cursor.x;
+				cursor.y = event.cursor.y;
 				break;
 
 			case EUI_EVENT_BUTTON_DOWN:
@@ -712,14 +712,14 @@ eui_vec2_t eui_get_text_size(char *s)
 	return size;
 }
 
-/* returns EUI_TRUE if the mouse cursor is hovering over the given area */
+/* returns EUI_TRUE if the cursor is hovering over the given area */
 int eui_is_hovered(eui_vec2_t pos, eui_vec2_t size)
 {
 	eui_transform_box(&pos, size);
 
-	if (mouse.x < pos.x || mouse.x > pos.x + size.x)
+	if (cursor.x < pos.x || cursor.x > pos.x + size.x)
 		return EUI_FALSE;
-	if (mouse.y < pos.y || mouse.y > pos.y + size.y)
+	if (cursor.y < pos.y || cursor.y > pos.y + size.y)
 		return EUI_FALSE;
 	return EUI_TRUE;
 }
@@ -742,15 +742,15 @@ void eui_clear(eui_color_t color)
 void eui_cursor(eui_color_t color)
 {
 	eui_vec2_t pos;
-	pos.x = mouse.x - 3;
-	pos.y = mouse.y - 3;
+	pos.x = cursor.x - 3;
+	pos.y = cursor.y - 3;
 	eui_font8x8(pos, font8x8_basic['x'], color);
 }
 
 /* get cursor position */
 eui_vec2_t eui_get_cursor_pos(void)
 {
-	return mouse;
+	return cursor;
 }
 
 /* get button state */

@@ -222,11 +222,11 @@ void eui_push_event_sdl2(SDL_Event *event)
 			break;
 
 		case SDL_MOUSEMOTION:
-			eui_event.type = EUI_EVENT_MOUSE;
-			eui_event.mouse.x = event->motion.x;
-			eui_event.mouse.y = event->motion.y;
-			eui_event.mouse.xrel = event->motion.xrel;
-			eui_event.mouse.yrel = event->motion.yrel;
+			eui_event.type = EUI_EVENT_CURSOR;
+			eui_event.cursor.x = event->motion.x;
+			eui_event.cursor.y = event->motion.y;
+			eui_event.cursor.xrel = event->motion.xrel;
+			eui_event.cursor.yrel = event->motion.yrel;
 			eui_push_event(eui_event);
 			break;
 
