@@ -33,6 +33,14 @@ target_compile_definitions(test_basic PUBLIC ${EUI_COMPILE_DEFINITIONS})
 target_compile_options(test_basic PUBLIC ${EUI_COMPILE_OPTIONS})
 target_include_directories(test_basic PUBLIC ${PROJECT_SOURCE_DIR}/source)
 
+# 4bpp test
+add_executable(test_4colors
+	${PROJECT_SOURCE_DIR}/source/tests/4colors.c
+	${PROJECT_SOURCE_DIR}/source/eui.c)
+target_compile_definitions(test_4colors PUBLIC EUI_PIXEL_DEPTH=2)
+target_compile_options(test_4colors PUBLIC ${EUI_COMPILE_OPTIONS})
+target_include_directories(test_4colors PUBLIC ${PROJECT_SOURCE_DIR}/source)
+
 # dos32 test
 if(${CMAKE_SYSTEM_NAME} STREQUAL DOS AND NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL I86)
 	add_executable(test_dos32
