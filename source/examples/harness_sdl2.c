@@ -24,7 +24,7 @@ SOFTWARE.
 
 /*
  *
- * SDL2_01.C
+ * HARNESS_SDL2.C
  *
  */
 
@@ -32,48 +32,37 @@ SOFTWARE.
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "eui_sdl2.h"
+#include "SDL.h"
 
-#define WIDTH (640)
-#define HEIGHT (480)
+#include "eui.h"
+#include "examples.h"
 
+#include "palette_vga.h"
+
+#ifndef EXAMPLE_FUNC
+#define EXAMPLE_FUNC example_hello
+#endif
+
+#ifndef EXAMPLE_TITLE
+#define EXAMPLE_TITLE "EUI Example (SDL2)"
+#endif
+
+#ifndef EXAMPLE_WIDTH
+#define EXAMPLE_WIDTH (640)
+#endif
+
+#ifndef EXAMPLE_HEIGHT
+#define EXAMPLE_HEIGHT (480)
+#endif
+
+/* SDL2 state */
 static SDL_Window *window;
 static SDL_Surface *surface8;
 static SDL_Surface *surface32;
 static SDL_Renderer *renderer;
 static SDL_Texture *texture;
-static SDL_Rect blitrect;
-static SDL_bool running;
-static SDL_Event event;
-
-void my_cool_button_callback(void *user)
-{
-	EUI_UNUSED(user);
-	printf("My cool button was pressed!\n");
-}
-
-/* install palette to SDL_Surface */
-void install_palette(const char *filename, SDL_Surface *surface)
-{
-	FILE *file;
-	int i;
-	SDL_Color colors[256];
-
-	file = fopen(filename, "rb");
-	if (!file)
-		return;
-
-	for (i = 0; i < 256; i++)
-	{
-		colors[i].r = fgetc(file);
-		colors[i].g = fgetc(file);
-		colors[i].b = fgetc(file);
-	}
-
-	SDL_SetPaletteColors(surface->format->palette, colors, 0, 256);
-
-	fclose(file);
-}
+static SDL_Rect rect;
+SDL_Color colors[256];
 
 /* main */
 int main(int argc, char **argv)
@@ -81,7 +70,7 @@ int main(int argc, char **argv)
 	uint32_t format;
 	unsigned int rmask, gmask, bmask, amask;
 	int bpp;
-	eui_vec2_t pos, size;
+	int i;
 
 	EUI_UNUSED(argc);
 	EUI_UNUSED(argv);
@@ -90,88 +79,73 @@ int main(int argc, char **argv)
 	SDL_Init(SDL_INIT_VIDEO);
 
 	/* create window */
-	window = SDL_CreateWindow("eui",
+	window = SDL_CreateWindow(EXAMPLE_TITLE,
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		WIDTH, HEIGHT,
+		EXAMPLE_WIDTH, EXAMPLE_HEIGHT,
 		SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI
 	);
 
 	/* create renderer */
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
-	SDL_RenderSetLogicalSize(renderer, WIDTH, HEIGHT);
+	SDL_RenderSetLogicalSize(renderer, EXAMPLE_WIDTH, EXAMPLE_HEIGHT);
 	SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
-	SDL_SetWindowMinimumSize(window, WIDTH, HEIGHT);
+	SDL_SetWindowMinimumSize(window, EXAMPLE_WIDTH, EXAMPLE_HEIGHT);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 	SDL_RenderPresent(renderer);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
 	/* create our render surface */
-	surface8 = SDL_CreateRGBSurface(0, WIDTH, HEIGHT, 8, 0, 0, 0, 0);
+	surface8 = SDL_CreateRGBSurface(0, EXAMPLE_WIDTH, EXAMPLE_HEIGHT, 8, 0, 0, 0, 0);
 	SDL_FillRect(surface8, NULL, 0);
 
+	/* init palette */
+	for (i = 0; i < 256; i++)
+	{
+		colors[i].r = palette_vga[i * 3];
+		colors[i].g = palette_vga[i * 3 + 1];
+		colors[i].b = palette_vga[i * 3 + 2];
+	}
+
 	/* install palette */
-	install_palette("vga.pal", surface8);
+	SDL_SetPaletteColors(surface8->format->palette, colors, 0, 256);
 
 	/* create display surface */
 	format = SDL_GetWindowPixelFormat(window);
 	SDL_PixelFormatEnumToMasks(format, &bpp, &rmask, &gmask, &bmask, &amask);
-	surface32 = SDL_CreateRGBSurface(0, WIDTH, HEIGHT, bpp, rmask, gmask, bmask, amask);
-	texture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, WIDTH, HEIGHT);
+	surface32 = SDL_CreateRGBSurface(0, EXAMPLE_WIDTH, EXAMPLE_HEIGHT, bpp, rmask, gmask, bmask, amask);
+	texture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, EXAMPLE_WIDTH, EXAMPLE_HEIGHT);
 
 	/* make sure relative mouse mode is disabled */
 	SDL_SetRelativeMouseMode(SDL_FALSE);
 
 	/* setup blit rect */
-	blitrect.x = 0;
-	blitrect.y = 0;
-	blitrect.w = WIDTH;
-	blitrect.h = HEIGHT;
+	rect.x = 0;
+	rect.y = 0;
+	rect.w = EXAMPLE_WIDTH;
+	rect.h = EXAMPLE_HEIGHT;
+
+	/* init eui */
+	eui_init(surface8->w, surface8->h, surface8->format->BitsPerPixel, surface8->pitch, surface8->pixels);
 
 	/* main loop */
-	running = SDL_TRUE;
-	while (running)
+	while (!SDL_QuitRequested())
 	{
-		/* parse sdl events */
-		while (SDL_PollEvent(&event))
-		{
-			eui_push_event_sdl2(&event);
+		/* clear screen */
+		SDL_FillRect(surface8, NULL, 0x00);
 
-			switch (event.type)
-			{
-				case SDL_QUIT:
-					running = SDL_FALSE;
-					break;
-			}
+		/* run eui context */
+		if (eui_context_begin())
+		{
+			/* run example func */
+			EXAMPLE_FUNC();
+
+			/* end eui context */
+			eui_context_end();
 		}
 
-		/* do eui */
-		if (eui_begin_sdl2(surface8))
-		{
-			/* clear */
-			eui_clear(18);
-
-			/* set alignment to center */
-			eui_set_align(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
-
-			/* button */
-			pos.x = 0;
-			pos.y = 0;
-			size.x = 128;
-			size.y = 16;
-			if (eui_button(pos, size, "My Cool Button", my_cool_button_callback, NULL))
-			{
-				pos.x = 0;
-				pos.y = 24;
-				eui_text(pos, 15, "Hovered");
-			}
-
-			/* end eui */
-			eui_end();
-		}
-
-		/* blit to screen */
-		SDL_BlitSurface(surface8, &blitrect, surface32, &blitrect);
+		/* copy to screen */
+		SDL_BlitSurface(surface8, &rect, surface32, &rect);
 		SDL_UpdateTexture(texture, NULL, surface32->pixels, surface32->pitch);
 		SDL_RenderClear(renderer);
 		SDL_RenderCopy(renderer, texture, NULL, NULL);
@@ -179,6 +153,7 @@ int main(int argc, char **argv)
 	}
 
 	/* quit */
+	eui_quit();
 	SDL_FreeSurface(surface8);
 	SDL_FreeSurface(surface32);
 	SDL_DestroyTexture(texture);

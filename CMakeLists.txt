@@ -11,98 +11,52 @@ set(CMAKE_C_STANDARD 90)
 set(CMAKE_C_STANDARD_REQUIRED TRUE)
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
-# compile options
+# default compile options
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
 	set(EUI_COMPILE_OPTIONS -std=c89 -pedantic -Wall -Wextra)
 else()
 	set(EUI_COMPILE_OPTIONS)
 endif()
 
-# compile definitions
+# default compile definitions
 set(EUI_COMPILE_DEFINITIONS EUI_PIXEL_DEPTH=8)
 
-# status
+# print status
 message(STATUS "EUI_COMPILE_OPTIONS: ${EUI_COMPILE_OPTIONS}")
 message(STATUS "EUI_COMPILE_DEFINITIONS: ${EUI_COMPILE_DEFINITIONS}")
 
-# basic test
-add_executable(test_basic
-	${PROJECT_SOURCE_DIR}/source/tests/basic.c
-	${PROJECT_SOURCE_DIR}/source/eui.c)
-target_compile_definitions(test_basic PUBLIC ${EUI_COMPILE_DEFINITIONS})
-target_compile_options(test_basic PUBLIC ${EUI_COMPILE_OPTIONS})
-target_include_directories(test_basic PUBLIC ${PROJECT_SOURCE_DIR}/source)
+#
+# SDL2 examples
+#
 
-# 4bpp test
-add_executable(test_4colors
-	${PROJECT_SOURCE_DIR}/source/tests/4colors.c
-	${PROJECT_SOURCE_DIR}/source/eui.c)
-target_compile_definitions(test_4colors PUBLIC EUI_PIXEL_DEPTH=2)
-target_compile_options(test_4colors PUBLIC ${EUI_COMPILE_OPTIONS})
-target_include_directories(test_4colors PUBLIC ${PROJECT_SOURCE_DIR}/source)
-
-# dos32 test
-if(${CMAKE_SYSTEM_NAME} STREQUAL DOS AND NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL I86)
-	add_executable(test_dos32
-		${PROJECT_SOURCE_DIR}/source/tests/dos32.c
-		${PROJECT_SOURCE_DIR}/source/eui.c)
-	target_compile_definitions(test_dos32 PUBLIC ${EUI_COMPILE_DEFINITIONS})
-	target_compile_options(test_basic PUBLIC ${EUI_COMPILE_OPTIONS})
-	target_include_directories(test_dos32 PUBLIC ${PROJECT_SOURCE_DIR}/source)
-endif()
-
-# sdl2 tests
 find_package(SDL2)
 if(SDL2_FOUND)
-	add_executable(test_sdl2_01
-		${PROJECT_SOURCE_DIR}/source/tests/sdl2_01.c
-		${PROJECT_SOURCE_DIR}/source/eui.c
-		${PROJECT_SOURCE_DIR}/source/eui_sdl2.c)
-	target_link_libraries(test_sdl2_01 PUBLIC SDL2::Main)
-	target_compile_definitions(test_sdl2_01 PUBLIC ${EUI_COMPILE_DEFINITIONS})
-	target_compile_options(test_sdl2_01 PUBLIC ${EUI_COMPILE_OPTIONS})
-	target_include_directories(test_sdl2_01 PUBLIC ${PROJECT_SOURCE_DIR}/source)
 
-	add_executable(test_sdl2_02
-		${PROJECT_SOURCE_DIR}/source/tests/sdl2_02.c
-		${PROJECT_SOURCE_DIR}/source/eui.c
-		${PROJECT_SOURCE_DIR}/source/eui_sdl2.c)
-	target_link_libraries(test_sdl2_02 PUBLIC SDL2::Main)
-	target_compile_definitions(test_sdl2_02 PUBLIC ${EUI_COMPILE_DEFINITIONS})
-	target_compile_options(test_sdl2_02 PUBLIC ${EUI_COMPILE_OPTIONS})
-	target_include_directories(test_sdl2_02 PUBLIC ${PROJECT_SOURCE_DIR}/source)
+	# hello
+	add_executable(hello_sdl2
+		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
+		${PROJECT_SOURCE_DIR}/source/examples/hello.c
+		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
+	target_compile_options(hello_sdl2 PUBLIC ${EUI_COMPILE_OPTIONS})
+	target_compile_definitions(hello_sdl2 PUBLIC ${EUI_COMPILE_DEFINITIONS})
+	target_include_directories(hello_sdl2 PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
+	target_link_libraries(hello_sdl2 SDL2::Main)
 
-	add_executable(test_sdl2_03
-		${PROJECT_SOURCE_DIR}/source/tests/sdl2_03.c
-		${PROJECT_SOURCE_DIR}/source/eui.c
-		${PROJECT_SOURCE_DIR}/source/eui_sdl2.c)
-	target_link_libraries(test_sdl2_03 PUBLIC SDL2::Main)
-	target_compile_definitions(test_sdl2_03 PUBLIC EUI_PIXEL_DEPTH=1)
-	target_compile_options(test_sdl2_03 PUBLIC ${EUI_COMPILE_OPTIONS})
-	target_include_directories(test_sdl2_03 PUBLIC ${PROJECT_SOURCE_DIR}/source)
-
-	add_executable(test_sdl2_04
-		${PROJECT_SOURCE_DIR}/source/tests/sdl2_04.c
-		${PROJECT_SOURCE_DIR}/source/eui.c
-		${PROJECT_SOURCE_DIR}/source/eui_sdl2.c)
-	target_link_libraries(test_sdl2_04 PUBLIC SDL2::Main)
-	target_compile_definitions(test_sdl2_04 PUBLIC EUI_PIXEL_DEPTH=4)
-	target_compile_options(test_sdl2_04 PUBLIC ${EUI_COMPILE_OPTIONS})
-	target_include_directories(test_sdl2_04 PUBLIC ${PROJECT_SOURCE_DIR}/source)
-
-	configure_file(${PROJECT_SOURCE_DIR}/data/vga.pal ${PROJECT_BINARY_DIR}/vga.pal COPYONLY)
 endif()
 
-# editor example
-if(SDL2_FOUND)
-	add_executable(editor
-		${PROJECT_SOURCE_DIR}/source/examples/editor.c
-		${PROJECT_SOURCE_DIR}/source/eui.c
-		${PROJECT_SOURCE_DIR}/source/eui_sdl2.c
-		${PROJECT_SOURCE_DIR}/source/thirdparty/tinyfiledialogs.c)
-	target_link_libraries(editor PUBLIC SDL2::Main)
-	target_compile_definitions(editor PUBLIC ${EUI_COMPILE_DEFINITIONS})
-	target_compile_options(editor PUBLIC ${EUI_COMPILE_OPTIONS})
-	target_include_directories(editor PUBLIC ${PROJECT_SOURCE_DIR}/source)
-	target_include_directories(editor PUBLIC ${PROJECT_SOURCE_DIR}/source/thirdparty)
+#
+# DOS examples
+#
+
+if(${CMAKE_SYSTEM_NAME} STREQUAL DOS)
+
+	# hello
+	add_executable(hello_dos
+		${PROJECT_SOURCE_DIR}/source/examples/harness_dos.c
+		${PROJECT_SOURCE_DIR}/source/examples/hello.c
+		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
+	target_compile_options(hello_dos PUBLIC ${EUI_COMPILE_OPTIONS})
+	target_compile_definitions(hello_dos PUBLIC ${EUI_COMPILE_DEFINITIONS})
+	target_include_directories(hello_dos PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
+
 endif()

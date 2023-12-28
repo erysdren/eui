@@ -23,25 +23,16 @@ SOFTWARE.
 */
 
 #pragma once
-#ifndef _EUI_SDL2_H_
-#define _EUI_SDL2_H_
+#ifndef _EXAMPLES_H_
+#define _EXAMPLES_H_
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "eui.h"
-#include "SDL.h"
-
-/* begin eui with given SDL_Surface destination */
-int eui_begin_sdl2(SDL_Surface *surface);
-
-/* process and push SDL2 event */
-void eui_push_event_sdl2(SDL_Event *event);
-
-/* draw SDL_Surface, transformed */
-void eui_pixelmap_sdl2(eui_vec2_t pos, SDL_Surface *surface);
+/* hello.c */
+void example_hello(void);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* _EUI_SDL2_H_ */
+#endif /* _EXAMPLES_H_ */

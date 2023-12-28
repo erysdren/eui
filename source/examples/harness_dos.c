@@ -24,64 +24,80 @@ SOFTWARE.
 
 /*
  *
- * 4COLORS.C
+ * HARNESS_DOS.C
  *
  */
 
 #include <stdio.h>
-#include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 
-static uint8_t screen[(320 * 200) / 4];
+#include <dos.h>
+#include <conio.h>
+
+#ifdef __DJGPP__
+#include <dpmi.h>
+#include <go32.h>
+#include <sys/nearptr.h>
+#include <sys/farptr.h>
+#define VGA_MEMORY (0xA0000 + __djgpp_conventional_base)
+#else
+#define VGA_MEMORY (0xA0000)
+#endif
 
 #include "eui.h"
+#include "examples.h"
+
+#ifndef EXAMPLE_FUNC
+#define EXAMPLE_FUNC example_hello
+#endif
+
+static uint8_t screen[320 * 200];
 
 /* main */
 int main(int argc, char **argv)
 {
-	eui_pixelmap_t dest;
-	eui_vec2_t pos, size;
-	FILE *file;
+	int old_mode;
+	union REGS regs;
 
 	EUI_UNUSED(argc);
 	EUI_UNUSED(argv);
 
-	/* setup pixelmap */
-	dest.w = 320;
-	dest.h = 200;
-	dest.pitch = 80;
-	dest.pixels = (eui_color_t *)screen;
+	/* get old video mode */
+	regs.h.ah = 0x0f;
+	int386(0x10, &regs, &regs);
+	old_mode = regs.h.al;
 
-	/* do eui */
-	if (eui_begin(dest))
+	/* set video mode to 0x13 */
+	regs.w.ax = 0x13;
+	int386(0x10, &regs, &regs);
+
+	/* init eui */
+	eui_init(320, 200, 8, 320, (void *)screen);
+
+	/* main loop */
+	while (!kbhit())
 	{
-		/* clear */
-		eui_clear(1);
-
-		/* set alignment to center */
-		eui_set_align(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
-
-		/* button */
-		pos.x = 0;
-		pos.y = 0;
-		size.x = 128;
-		size.y = 16;
-		if (eui_button(pos, size, "My Cool Button", NULL, NULL))
+		/* run eui context */
+		if (eui_context_begin())
 		{
-			pos.x = 0;
-			pos.y = 24;
-			eui_text(pos, 3, "Hovered");
+			/* run example func */
+			EXAMPLE_FUNC();
+
+			/* end eui context */
+			eui_context_end();
 		}
 
-		/* end eui */
-		eui_end();
+		/* copy to screen */
+		memcpy((void *)VGA_MEMORY, (void *)screen, sizeof(screen));
 	}
 
-	/* dump screen buffer */
-	file = fopen("screen.data", "wb");
-	fwrite(screen, sizeof(screen), 1, file);
-	fclose(file);
+	/* quit */
+	eui_quit();
+
+	/* reset video mode */
+	regs.w.ax = old_mode;
+	int386(0x10, &regs, &regs);
 
 	return 0;
 }

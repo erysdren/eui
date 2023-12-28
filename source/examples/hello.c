@@ -24,64 +24,44 @@ SOFTWARE.
 
 /*
  *
- * BASIC.C
+ * HELLO.C
  *
  */
 
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <string.h>
-
-static uint8_t screen[160 * 100];
-
 #include "eui.h"
 
-/* main */
-int main(int argc, char **argv)
+void example_hello(void)
 {
-	eui_pixelmap_t dest;
-	eui_vec2_t pos, size;
-	FILE *file;
+	/* clear screen */
+	eui_screen_clear(0x01);
 
-	EUI_UNUSED(argc);
-	EUI_UNUSED(argv);
+	/* center alignment */
+	eui_frame_align_set(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
 
-	/* setup pixelmap */
-	dest.w = 160;
-	dest.h = 100;
-	dest.pitch = 160;
-	dest.pixels = (eui_color_t *)screen;
+	/* left aligned text */
+	eui_draw_box(0, -80, 192, 64, 0x0F);
+	eui_draw_box_border(0, -80, 192, 64, 2, 0x02);
 
-	/* do eui */
-	if (eui_begin(dest))
-	{
-		/* clear */
-		eui_clear(18);
+	eui_frame_push(0, -80, 176, 48);
+	eui_frame_align_set(EUI_ALIGN_START, EUI_ALIGN_MIDDLE);
+	eui_draw_text(0, 0, 0x00, "Left aligned text\nwith a newline!");
+	eui_frame_pop();
 
-		/* set alignment to center */
-		eui_set_align(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
+	/* center aligned text */
+	eui_draw_box(0, 0, 192, 64, 0x0F);
+	eui_draw_box_border(0, 0, 192, 64, 2, 0x02);
 
-		/* button */
-		pos.x = 0;
-		pos.y = 0;
-		size.x = 128;
-		size.y = 16;
-		if (eui_button(pos, size, "My Cool Button", NULL, NULL))
-		{
-			pos.x = 0;
-			pos.y = 24;
-			eui_text(pos, 15, "Hovered");
-		}
+	eui_frame_push(0, 0, 192, 64);
+	eui_frame_align_set(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
+	eui_draw_text(0, 0, 0x00, "Center aligned text\nwith a newline!");
+	eui_frame_pop();
 
-		/* end eui */
-		eui_end();
-	}
+	/* right aligned text */
+	eui_draw_box(0, 80, 192, 64, 0x0F);
+	eui_draw_box_border(0, 80, 192, 64, 2, 0x02);
 
-	/* dump screen buffer */
-	file = fopen("screen.dat", "wb");
-	fwrite(screen, 160 * 100, 1, file);
-	fclose(file);
-
-	return 0;
+	eui_frame_push(0, 80, 176, 48);
+	eui_frame_align_set(EUI_ALIGN_END, EUI_ALIGN_MIDDLE);
+	eui_draw_text(0, 0, 0x00, "Right aligned text\nwith a newline!");
+	eui_frame_pop();
 }
