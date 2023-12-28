@@ -16,6 +16,7 @@ While CMake is used to build the test and example programs, it is not required f
 - Integer math only.
 - Draws into a raw pixel buffer by default.
 - Supports 1, 2, 4, 8, 16, and 32 bits-per-pixel drawing.
+- No dynamic memory allocation.
 
 ## Usage
 
@@ -43,6 +44,10 @@ eui_frame_pop();
 ```
 
 ![Hello, world!](./.github/hello_world.png "Hello, world!")
+
+## Configuration Switches
+
+- `EUI_MAX_FRAMES`: Maximum number of nested frames. Default: 64
 
 ## Source Code Guide
 

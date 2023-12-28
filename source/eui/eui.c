@@ -179,7 +179,9 @@ static unsigned char font8x8_basic[128][8] = {
  *
  */
 
-#define MAX_FRAMES (64)
+#ifndef EUI_MAX_FRAMES
+#define EUI_MAX_FRAMES (64)
+#endif
 
 /*
  *
@@ -203,7 +205,7 @@ typedef struct frame_t {
  */
 
 static struct {
-	frame_t frames[MAX_FRAMES];
+	frame_t frames[EUI_MAX_FRAMES];
 	int frame_index;
 	int w;
 	int h;
@@ -609,7 +611,7 @@ void eui_context_end(void)
 /* returns EUI_FALSE on failure */
 int eui_frame_push(int x, int y, int w, int h)
 {
-	if (state.frame_index == MAX_FRAMES - 1)
+	if (state.frame_index == EUI_MAX_FRAMES - 1)
 		return EUI_FALSE;
 
 	eui_transform_box(&x, &y, w, h);
