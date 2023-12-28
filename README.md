@@ -1,8 +1,6 @@
 
 # EUI
 
-![EUI Example](./.github/snonk.png "EUI Example")
-
 EUI is a small UI and drawing library designed for homebrew games, debug UIs, embedded systems, and low resolution or low color depth displays.
 
 The base EUI library is only two files, [`eui.c`](./source/eui/eui.c) and [`eui.h`](./source/eui/eui.h). To add EUI to your project, just clone the files into your source tree and compile.
@@ -18,6 +16,33 @@ While CMake is used to build the test and example programs, it is not required f
 - Integer math only.
 - Draws into a raw pixel buffer by default.
 - Supports 1, 2, 4, 8, 16, and 32 bits-per-pixel drawing.
+
+## Usage
+
+Here is a basic EUI usage example that assumes 4 bit color and the default 16 color VGA palette.
+
+```c
+/* set alignment to the center of the frame */
+eui_frame_align_set(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
+
+/* draw 192x64 box and draw a 2px border */
+eui_draw_box(0, 0, 192, 64, 0x0F);
+eui_draw_box_border(0, 0, 192, 64, 2, 0x02);
+
+/* create child frame with 8 pixels of padding on each side */
+eui_frame_push(0, 0, 176, 48);
+
+/* set child frame alignment to top-left */
+eui_frame_align_set(EUI_ALIGN_START, EUI_ALIGN_START);
+
+/* draw a string with the default 8x8 font */
+eui_draw_text(0, 0, 0x00, "Hello, world!");
+
+/* destroy child frame */
+eui_frame_pop();
+```
+
+![Hello, world!](./.github/hello_world.png "Hello, world!")
 
 ## Source Code Guide
 
