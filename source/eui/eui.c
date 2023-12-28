@@ -196,6 +196,7 @@ typedef struct frame_t {
 	struct {
 		int x, y;
 	} align;
+	int clip;
 } frame_t;
 
 /*
@@ -467,46 +468,80 @@ static void eui_transform_box(int *x, int *y, int w, int h)
 	}
 }
 
-/* clip box to screen size, returns 0 if the shape will never be visible */
-static int eui_clip_box(int *x, int *y, int *w, int *h)
+/* clip box to arbitrary size, returns EUI_FALSE if the shape will never be visible */
+static int eui_clip_box_lower(int *x, int *y, int *w, int *h, int cx, int cy, int cw, int ch)
 {
+	int start_x, start_y, end_x, end_y;
+
+	start_x = cx;
+	start_y = cy;
+	end_x = cx + cw;
+	end_y = cy + ch;
+
 	/* it will never become visible */
-	if (*x >= state.w)
+	if (*x >= end_x)
 		return EUI_FALSE;
-	if (*y >= state.h)
+	if (*y >= end_y)
 		return EUI_FALSE;
-	if (*x + *w < 0)
+	if (*x + *w < start_x)
 		return EUI_FALSE;
-	if (*y + *h < 0)
+	if (*y + *h < start_y)
 		return EUI_FALSE;
 
 	/* clip to top edge */
-	if (*y < 0)
+	if (*y < start_y)
 	{
-		*h += *y;
-		*y = 0;
+		*h += *y - start_y;
+		*y = start_y;
 	}
 
 	/* clip to bottom edge */
-	if (*y + *h >= state.h)
+	if (*y + *h >= end_y)
 	{
-		*h = state.h - *y;
+		*h = end_y - *y;
 	}
 
 	/* clip to left edge */
-	if (*x < 0)
+	if (*x < start_x)
 	{
-		*w += *x;
-		*x = 0;
+		*w += *x - start_x;
+		*x = start_x;
 	}
 
 	/* clip to right edge */
-	if (*x + *w >= state.w)
+	if (*x + *w >= end_x)
 	{
-		*w = state.w - *x;
+		*w = end_x - *x;
 	}
 
 	return EUI_TRUE;
+}
+
+/* clip box to screen size, returns EUI_FALSE if the shape will never be visible */
+static int eui_clip_box(int *x, int *y, int *w, int *h)
+{
+	if (state.frames[state.frame_index].clip)
+	{
+		int frame_x, frame_y, frame_w, frame_h;
+
+		/* save frame coordinates */
+		frame_x = state.frames[state.frame_index].x;
+		frame_y = state.frames[state.frame_index].y;
+		frame_w = state.frames[state.frame_index].w;
+		frame_h = state.frames[state.frame_index].h;
+
+		/* clip frame to screen */
+		if (!eui_clip_box_lower(&frame_x, &frame_y, &frame_w, &frame_h, 0, 0, state.w, state.h))
+			return EUI_FALSE;
+
+		/* clip shape to frame */
+		return eui_clip_box_lower(x, y, w, h, frame_x, frame_y, frame_w, frame_h);
+	}
+	else
+	{
+		/* clip shape to screen */
+		return eui_clip_box_lower(x, y, w, h, 0, 0, state.w, state.h);
+	}
 }
 
 /*
@@ -624,6 +659,7 @@ int eui_frame_push(int x, int y, int w, int h)
 	state.frames[state.frame_index].h = h;
 	state.frames[state.frame_index].align.x = EUI_ALIGN_START;
 	state.frames[state.frame_index].align.y = EUI_ALIGN_START;
+	state.frames[state.frame_index].clip = EUI_FALSE;
 
 	return EUI_TRUE;
 }
@@ -650,6 +686,18 @@ void eui_frame_align_get(int *align_x, int *align_y)
 
 	if (align_y)
 		*align_y = state.frames[state.frame_index].align.y;
+}
+
+/* if set to EUI_TRUE, elements will be clipped to the current frame edges */
+void eui_frame_clip_set(int clip)
+{
+	state.frames[state.frame_index].clip = clip ? EUI_TRUE : EUI_FALSE;
+}
+
+/* returns EUI_TRUE if clipping is enabled for this frame  */
+int eui_frame_clip_get(void)
+{
+	return state.frames[state.frame_index].clip ? EUI_TRUE : EUI_FALSE;
 }
 
 /*

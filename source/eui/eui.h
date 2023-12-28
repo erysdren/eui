@@ -101,6 +101,12 @@ void eui_frame_align_set(int align_x, int align_y);
 /* get alignment for elements in the current frame */
 void eui_frame_align_get(int *align_x, int *align_y);
 
+/* if set to EUI_TRUE, elements will be clipped to the current frame edges */
+void eui_frame_clip_set(int clip);
+
+/* returns EUI_TRUE if clipping is enabled for this frame  */
+int eui_frame_clip_get(void);
+
 /*
  * utilities
  */
