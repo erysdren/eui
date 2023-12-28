@@ -766,7 +766,7 @@ void eui_draw_text(int x, int y, unsigned int color, char *s)
 	int start_x;
 	char *ptr;
 	int w, h;
-	unsigned long len = 0;
+	unsigned int len = 0;
 
 	/* get text size */
 	if (!eui_get_text_dimensions(&w, &h, s))
