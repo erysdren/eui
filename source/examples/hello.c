@@ -35,33 +35,22 @@ void example_hello(void)
 	/* clear screen */
 	eui_screen_clear(0x01);
 
-	/* center alignment */
+	/* set alignment to the center of the frame */
 	eui_frame_align_set(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
 
-	/* left aligned text */
-	eui_draw_box(0, -80, 192, 64, 0x0F);
-	eui_draw_box_border(0, -80, 192, 64, 2, 0x02);
-
-	eui_frame_push(0, -80, 176, 48);
-	eui_frame_align_set(EUI_ALIGN_START, EUI_ALIGN_MIDDLE);
-	eui_draw_text(0, 0, 0x00, "Left aligned text\nwith a newline!");
-	eui_frame_pop();
-
-	/* center aligned text */
+	/* draw 192x64 box and draw a 2px border */
 	eui_draw_box(0, 0, 192, 64, 0x0F);
 	eui_draw_box_border(0, 0, 192, 64, 2, 0x02);
 
-	eui_frame_push(0, 0, 192, 64);
-	eui_frame_align_set(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
-	eui_draw_text(0, 0, 0x00, "Center aligned text\nwith a newline!");
-	eui_frame_pop();
+	/* create child frame with 8 pixels of padding on each side */
+	eui_frame_push(0, 0, 176, 48);
 
-	/* right aligned text */
-	eui_draw_box(0, 80, 192, 64, 0x0F);
-	eui_draw_box_border(0, 80, 192, 64, 2, 0x02);
+	/* set child frame alignment to top-left */
+	eui_frame_align_set(EUI_ALIGN_START, EUI_ALIGN_START);
 
-	eui_frame_push(0, 80, 176, 48);
-	eui_frame_align_set(EUI_ALIGN_END, EUI_ALIGN_MIDDLE);
-	eui_draw_text(0, 0, 0x00, "Right aligned text\nwith a newline!");
+	/* draw a string with the default 8x8 font */
+	eui_draw_text(0, 0, 0x00, "Hello, world!");
+
+	/* destroy child frame */
 	eui_frame_pop();
 }
