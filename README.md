@@ -5,45 +5,31 @@
 
 EUI is a small UI and drawing library designed for homebrew games, debug UIs, embedded systems, and low resolution or low color depth displays.
 
-The main EUI library is only two files, [`eui.c`](./source/eui.c) and [`eui.h`](./source/eui.h). To add EUI to your project, just clone the files into your source tree and compile.
+The base EUI library is only two files, [`eui.c`](./source/eui/eui.c) and [`eui.h`](./source/eui/eui.h). To add EUI to your project, just clone the files into your source tree and compile.
 
 While CMake is used to build the test and example programs, it is not required for EUI itself.
 
-> [!WARNING]
-> EUI is *not* yet production-ready, and the API is still changing. Proceed with caution.
+## Features
 
-## Configuration Switches
-
-### Required
-
-- `EUI_PIXEL_DEPTH`: Set target pixel depth in bits. Valid values:
-	- `1` bit per pixel, 2 monochrome colors.
-	- `2` bits per pixel, 4 indexed colors.
-	- `4` bits per pixel, 16 indexed colors.
-	- `8` bits per pixel, 256 indexed colors.
-	- `16` bits per pixel, "high color" (Usually RGB565).
-	- `32` bits per pixel, "true color" (usually RGBA8888).
+- Nested frames with relative element positioning and alignment.
+- Automatic text justification.
+- Automatic shape clipping.
+- Built-in 8x8 pixel font.
+- Integer math only.
+- Draws into a raw pixel buffer by default.
+- Supports 1, 2, 4, 8, 16, and 32 bits-per-pixel drawing.
 
 ## Source Code Guide
 
 ### Main Files
 
-- [`eui.c`](./source/eui.c) & [`eui.h`](./source/eui.h): Main platform agnostic EUI library.
-- [`eui_sdl2.c`](./source/eui_sdl2.c) & [`eui_sdl2.h`](./source/eui_sdl2.h): Helper functions for integration with SDL2.
+- [`eui.c`](./source/eui/eui.c) & [`eui.h`](./source/eui/eui.h): Base drawing primitives library.
 
 ### Examples
 
-- [`editor.c`](./source/examples/editor.c): Small image editor with the SDL2 backend.
-
-### Tests
-
-- [`4colors.c`](./source/tests/4colors.c): Render a single frame with a button (2bpp).
-- [`basic.c`](./source/tests/basic.c): Render a single frame with a button.
-- [`dos32.c`](./source/tests/dos32.c): Handle a button and mouse input on MS-DOS.
-- [`sdl2_01.c`](./source/tests/sdl2_01.c): Handle a button and mouse input on SDL2.
-- [`sdl2_02.c`](./source/tests/sdl2_02.c): Borderless window with button.
-- [`sdl2_03.c`](./source/tests/sdl2_02.c): SDL2 1bpp test.
-- [`sdl2_04.c`](./source/tests/sdl2_02.c): SDL2 4bpp test.
+- [`hello.c`](./source/examples/hello.c): "Hello, World!".
+- [`harness_dos.c`](./source/examples/harness_dos.c): MS-DOS implementation and example harness.
+- [`harness_sdl2.c`](./source/examples/harness_sdl2.c): SDL2 implementation and example harness.
 
 ## Tested Compilers & Platforms
 
@@ -52,24 +38,12 @@ While CMake is used to build the test and example programs, it is not required f
 - Watcom (DOS16, DOS32)
 - TCC (Linux)
 
-## Todo
-
-- Optimize font, pixel, and horizontal line functions
-- Optimize sgn() macro
-- Support VGA text buffers
-- Support raw text buffers
-- Abstract SDL2 and DOS backends and make tests/examples modular
-- Queued draw commands instead of immediate
-- Only redraw updated rectangles
-- API Stablization and major cleanup
-
 ## Credits
 
 - [SUI](https://github.com/shpuld/sui-qc/) (License: MIT)
 - [font8x8](https://github.com/dhepper/font8x8/) (License: Public Domain)
 - [Danelaw](https://thingvellir.net/git/danelaw/) (License: CC0 1.0)
 - [SDL2 CMake modules](https://github.com/aminosbh/sdl2-cmake-modules) (License: BSD-3)
-- [tiny file dialogs](https://sourceforge.net/projects/tinyfiledialogs/) (License: zlib)
 
 ## License
 
