@@ -248,7 +248,7 @@ static void set_box_1(int x, int y, int w, int h, unsigned int color)
 
 	for (yy = y; yy < y + h; yy++)
 	{
-		if (x % 4 || w % 4)
+		if (x % 8 || w % 8)
 		{
 			/* not aligned */
 			for (xx = x; xx < x + w; xx++)
