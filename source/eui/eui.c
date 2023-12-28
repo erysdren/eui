@@ -406,7 +406,10 @@ static void set_glyph_font8x8(int x, int y, unsigned int glyph, unsigned int col
 	int xx, yy, xxx, yyy;
 	unsigned char *bitmap;
 
-	bitmap = font8x8_basic[glyph & 128];
+	if (glyph >= 128)
+		return;
+
+	bitmap = font8x8_basic[glyph];
 
 	for (xx = 0; xx < 8; xx++)
 	{
