@@ -46,7 +46,7 @@ eui_frame_pop();
 
 ## Source Code Guide
 
-### Main Files
+### Modules
 
 - [`eui.c`](./source/eui/eui.c) & [`eui.h`](./source/eui/eui.h): Base drawing primitives library.
 
