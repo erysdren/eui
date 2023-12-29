@@ -30,19 +30,20 @@ SOFTWARE.
 
 #include "eui.h"
 
-void draw_titled_window(int x, int y, int w, int h, char *title, int z)
+void draw_titled_window(int x, int y, int w, int h, char *title, int focused)
 {
 	/* enter frame */
 	eui_frame_push(x, y, w, h);
 
 	/* offset z */
-	eui_frame_z_offset(z);
+	if (focused)
+		eui_frame_z_offset(8);
 
 	/* center align */
 	eui_frame_align_set(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
 
 	/* window background */
-	eui_draw_box(0, 0, w, h, 0x0F);
+	eui_draw_box(0, 0, w, h, 0x08);
 
 	/* outer 1px black border */
 	eui_draw_box_border(0, 0, w, h, 1, 0x00);
@@ -61,8 +62,21 @@ void draw_titled_window(int x, int y, int w, int h, char *title, int z)
 	eui_draw_box(0, 17, w - 8, h - 17 - 4, 0x0F);
 
 	/* title */
+	eui_frame_align_set(EUI_ALIGN_START, EUI_ALIGN_START);
+	eui_draw_box(4, 4, 12, 12, 0x07);
+	eui_frame_align_set(EUI_ALIGN_END, EUI_ALIGN_START);
+	eui_draw_box(-4, 4, 12, 12, 0x07);
 	eui_frame_align_set(EUI_ALIGN_MIDDLE, EUI_ALIGN_START);
-	eui_draw_text(0, 6, 0x00, title);
+	if (focused)
+	{
+		eui_draw_box(0, 4, w - 34, 12, 0x04);
+		eui_draw_text(0, 6, 0x0F, title);
+	}
+	else
+	{
+		eui_draw_box(0, 4, w - 34, 12, 0x0F);
+		eui_draw_text(0, 6, 0x00, title);
+	}
 
 	/* menu bar */
 	eui_frame_align_set(EUI_ALIGN_START, EUI_ALIGN_START);
@@ -78,14 +92,12 @@ void draw_titled_window(int x, int y, int w, int h, char *title, int z)
 void example_windows(void)
 {
 	/* clear screen */
-	eui_screen_clear(0x08);
+	eui_screen_clear(0x07);
 
 	/* set alignment to the center of the frame */
 	eui_frame_align_set(EUI_ALIGN_START, EUI_ALIGN_START);
 
-	/* draw a fake window */
-	draw_titled_window(64, 48, 316, 218, "Program Manager", 2);
-
-	/* draw a fake window */
-	draw_titled_window(167, 98, 316, 218, "Program Manager", 0);
+	/* draw some fake windows */
+	draw_titled_window(167, 98, 316, 218, "Program Manager", EUI_TRUE);
+	draw_titled_window(64, 48, 316, 218, "File Manager", EUI_FALSE);
 }
