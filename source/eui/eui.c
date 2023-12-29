@@ -1240,6 +1240,24 @@ int eui_font_get(void)
 /* clear screen with color */
 void eui_screen_clear(unsigned int color)
 {
+	switch (state.bpp)
+	{
+		case 1:
+			if (color)
+				color = 0xFF;
+			else
+				color = 0x00;
+			break;
+
+		case 2:
+			color = color << 6 | color << 4 | color << 2 | color;
+			break;
+
+		case 4:
+			color = color << 4 | color;
+			break;
+	}
+
 	memset(state.buffer, color, state.h * state.pitch);
 }
 
