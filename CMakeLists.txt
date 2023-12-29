@@ -42,6 +42,16 @@ if(SDL2_FOUND)
 	target_include_directories(hello_sdl2 PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
 	target_link_libraries(hello_sdl2 SDL2::Main)
 
+	# hello (4bpp)
+	add_executable(hello_sdl2_4bpp
+		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2_4bpp.c
+		${PROJECT_SOURCE_DIR}/source/examples/hello.c
+		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
+	target_compile_options(hello_sdl2_4bpp PUBLIC ${EUI_COMPILE_OPTIONS})
+	target_compile_definitions(hello_sdl2_4bpp PUBLIC ${EUI_COMPILE_DEFINITIONS})
+	target_include_directories(hello_sdl2_4bpp PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
+	target_link_libraries(hello_sdl2_4bpp SDL2::Main)
+
 	# order
 	add_executable(order_sdl2
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
@@ -52,6 +62,16 @@ if(SDL2_FOUND)
 	target_include_directories(order_sdl2 PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
 	target_link_libraries(order_sdl2 SDL2::Main)
 
+	# order (4bpp)
+	add_executable(order_sdl2_4bpp
+		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2_4bpp.c
+		${PROJECT_SOURCE_DIR}/source/examples/order.c
+		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
+	target_compile_options(order_sdl2_4bpp PUBLIC ${EUI_COMPILE_OPTIONS})
+	target_compile_definitions(order_sdl2_4bpp PUBLIC ${EUI_COMPILE_DEFINITIONS} EXAMPLE_FUNC=example_order)
+	target_include_directories(order_sdl2_4bpp PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
+	target_link_libraries(order_sdl2_4bpp SDL2::Main)
+
 	# font
 	add_executable(font_sdl2
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
@@ -61,6 +81,16 @@ if(SDL2_FOUND)
 	target_compile_definitions(font_sdl2 PUBLIC ${EUI_COMPILE_DEFINITIONS} EXAMPLE_FUNC=example_font)
 	target_include_directories(font_sdl2 PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
 	target_link_libraries(font_sdl2 SDL2::Main)
+
+	# font (4bpp)
+	add_executable(font_sdl2_4bpp
+		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2_4bpp.c
+		${PROJECT_SOURCE_DIR}/source/examples/font.c
+		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
+	target_compile_options(font_sdl2_4bpp PUBLIC ${EUI_COMPILE_OPTIONS})
+	target_compile_definitions(font_sdl2_4bpp PUBLIC ${EUI_COMPILE_DEFINITIONS} EXAMPLE_FUNC=example_font)
+	target_include_directories(font_sdl2_4bpp PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
+	target_link_libraries(font_sdl2_4bpp SDL2::Main)
 
 endif()
 
