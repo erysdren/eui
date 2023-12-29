@@ -130,6 +130,7 @@ int main(int argc, char **argv)
 
 	/* init eui */
 	eui_init(surface8->w, surface8->h, surface8->format->BitsPerPixel, surface8->pitch, surface8->pixels);
+	eui_palette_set(256, palette_vga);
 
 	/* main loop */
 	while (!SDL_QuitRequested())

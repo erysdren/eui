@@ -995,7 +995,7 @@ static void eui_clut_generate(void)
 			g = (state.palette[x * 3 + 1] + state.palette[y * 3 + 1]) >> 1;
 			b = (state.palette[x * 3 + 2] + state.palette[y * 3 + 2]) >> 1;
 
-			state.clut[y * state.num_palette_entries + x] = eui_palette_closest(r, g, b);
+			state.clut[y * 256 + x] = (unsigned char)eui_palette_closest(r, g, b);
 		}
 	}
 }
