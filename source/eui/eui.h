@@ -107,6 +107,15 @@ void eui_frame_clip_set(int clip);
 /* returns EUI_TRUE if clipping is enabled for this frame  */
 int eui_frame_clip_get(void);
 
+/* offset z value of current frame */
+void eui_frame_z_offset(int z);
+
+/* set z value of current frame */
+void eui_frame_z_set(int z);
+
+/* get z value of current frame */
+int eui_frame_z_get(void);
+
 /*
  * utilities
  */

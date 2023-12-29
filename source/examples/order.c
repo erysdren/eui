@@ -22,20 +22,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#pragma once
-#ifndef _EXAMPLES_H_
-#define _EXAMPLES_H_
-#ifdef __cplusplus
-extern "C" {
-#endif
+/*
+ *
+ * ORDER.C
+ *
+ */
 
-/* hello.c */
-void example_hello(void);
+#include "eui.h"
 
-/* order.c */
-void example_order(void);
+static void box(int x, int y, int z)
+{
+	/* create child frame with 8 pixels of padding on each side */
+	eui_frame_push(x, y, 176, 48);
 
-#ifdef __cplusplus
+	/* set z */
+	eui_frame_z_offset(z);
+
+	/* set child frame alignment to top-left */
+	eui_frame_align_set(EUI_ALIGN_START, EUI_ALIGN_START);
+
+	/* draw 192x64 box and draw a 2px border */
+	eui_draw_box(-16, -16, 192, 64, 0x0F);
+	eui_draw_box_border(-16, -16, 192, 64, 2, 0x02);
+
+	/* draw a string with the default 8x8 font */
+	eui_draw_text(0, 0, 0x00, "Hello, world!");
+
+	/* destroy child frame */
+	eui_frame_pop();
 }
-#endif
-#endif /* _EXAMPLES_H_ */
+
+void example_order(void)
+{
+	/* clear screen */
+	eui_screen_clear(0x01);
+
+	/* set alignment to the center of the frame */
+	eui_frame_align_set(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
+
+	/* first box */
+	box(0, 0, 2);
+
+	/* second box */
+	box(48, 32, 0);
+}

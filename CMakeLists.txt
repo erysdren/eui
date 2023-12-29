@@ -42,6 +42,16 @@ if(SDL2_FOUND)
 	target_include_directories(hello_sdl2 PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
 	target_link_libraries(hello_sdl2 SDL2::Main)
 
+	# order
+	add_executable(order_sdl2
+		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
+		${PROJECT_SOURCE_DIR}/source/examples/order.c
+		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
+	target_compile_options(order_sdl2 PUBLIC ${EUI_COMPILE_OPTIONS})
+	target_compile_definitions(order_sdl2 PUBLIC ${EUI_COMPILE_DEFINITIONS} EXAMPLE_FUNC=example_order)
+	target_include_directories(order_sdl2 PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
+	target_link_libraries(order_sdl2 SDL2::Main)
+
 endif()
 
 #
@@ -58,5 +68,14 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL DOS)
 	target_compile_options(hello_dos PUBLIC ${EUI_COMPILE_OPTIONS})
 	target_compile_definitions(hello_dos PUBLIC ${EUI_COMPILE_DEFINITIONS})
 	target_include_directories(hello_dos PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
+
+	# order
+	add_executable(order_dos
+		${PROJECT_SOURCE_DIR}/source/examples/harness_dos.c
+		${PROJECT_SOURCE_DIR}/source/examples/order.c
+		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
+	target_compile_options(order_dos PUBLIC ${EUI_COMPILE_OPTIONS})
+	target_compile_definitions(order_dos PUBLIC ${EUI_COMPILE_DEFINITIONS} EXAMPLE_FUNC=example_order)
+	target_include_directories(order_dos PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
 
 endif()
