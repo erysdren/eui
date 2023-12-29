@@ -35,6 +35,14 @@ extern "C" {
  *
  */
 
+#ifndef EUI_MAX_FRAMES
+#define EUI_MAX_FRAMES (128)
+#endif
+
+#ifndef EUI_MAX_DRAWCMDS
+#define EUI_MAX_DRAWCMDS (1024)
+#endif
+
 #define EUI_UNUSED(x) ((void)(x))
 
 /*
