@@ -42,8 +42,8 @@ static void box(int x, int y, int z)
 	eui_frame_align_set(EUI_ALIGN_START, EUI_ALIGN_START);
 
 	/* draw 192x64 box and draw a 2px border */
-	eui_draw_box(-16, -16, 192, 64, 0x0F);
-	eui_draw_box_border(-16, -16, 192, 64, 2, 0x02);
+	eui_draw_box(-8, -8, 192, 64, 0x0F);
+	eui_draw_box_border(-8, -8, 192, 64, 2, 0x02);
 
 	/* draw a string with the default 8x8 font */
 	eui_draw_text(0, 0, 0x00, "Hello, world!");
