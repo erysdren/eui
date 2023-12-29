@@ -490,7 +490,7 @@ static void eui_transform_box(int *x, int *y, int w, int h)
 	}
 }
 
-/* clip box to arbitrary size, returns EUI_FALSE if the shape will never be visible */
+/* clip box to arbitrary size, returns EUI_TRUE if the shape will be completely clipped */
 static int eui_clip_box_lower(int *x, int *y, int *w, int *h, int cx, int cy, int cw, int ch)
 {
 	int start_x, start_y, end_x, end_y;
@@ -502,13 +502,13 @@ static int eui_clip_box_lower(int *x, int *y, int *w, int *h, int cx, int cy, in
 
 	/* it will never become visible */
 	if (*x >= end_x)
-		return EUI_FALSE;
+		return EUI_TRUE;
 	if (*y >= end_y)
-		return EUI_FALSE;
+		return EUI_TRUE;
 	if (*x + *w < start_x)
-		return EUI_FALSE;
+		return EUI_TRUE;
 	if (*y + *h < start_y)
-		return EUI_FALSE;
+		return EUI_TRUE;
 
 	/* clip to top edge */
 	if (*y < start_y)
@@ -536,10 +536,10 @@ static int eui_clip_box_lower(int *x, int *y, int *w, int *h, int cx, int cy, in
 		*w = end_x - *x;
 	}
 
-	return EUI_TRUE;
+	return EUI_FALSE;
 }
 
-/* clip box to screen size, returns EUI_FALSE if the shape will never be visible */
+/* clip box to current frame and screen size, returns EUI_TRUE if the shape will be completely clipped */
 static int eui_clip_box(int *x, int *y, int *w, int *h)
 {
 	if (state.frames[state.frame_index].clip)
@@ -553,8 +553,8 @@ static int eui_clip_box(int *x, int *y, int *w, int *h)
 		frame_h = state.frames[state.frame_index].h;
 
 		/* clip frame to screen */
-		if (!eui_clip_box_lower(&frame_x, &frame_y, &frame_w, &frame_h, 0, 0, state.w, state.h))
-			return EUI_FALSE;
+		if (eui_clip_box_lower(&frame_x, &frame_y, &frame_w, &frame_h, 0, 0, state.w, state.h))
+			return EUI_TRUE;
 
 		/* clip shape to frame */
 		return eui_clip_box_lower(x, y, w, h, frame_x, frame_y, frame_w, frame_h);
@@ -845,7 +845,7 @@ void eui_draw_box(int x, int y, int w, int h, unsigned int color)
 	drawcmd.box.y = y;
 	drawcmd.box.w = w;
 	drawcmd.box.h = h;
-	if (eui_clip_box(&drawcmd.box.x, &drawcmd.box.y, &drawcmd.box.w, &drawcmd.box.h))
+	if (!eui_clip_box(&drawcmd.box.x, &drawcmd.box.y, &drawcmd.box.w, &drawcmd.box.h))
 		eui_drawcmd_push(&drawcmd);
 }
 
@@ -865,7 +865,7 @@ void eui_draw_box_border(int x, int y, int w, int h, int t, unsigned int color)
 	drawcmd.box.y = y;
 	drawcmd.box.w = w;
 	drawcmd.box.h = t;
-	if (eui_clip_box(&drawcmd.box.x, &drawcmd.box.y, &drawcmd.box.w, &drawcmd.box.h))
+	if (!eui_clip_box(&drawcmd.box.x, &drawcmd.box.y, &drawcmd.box.w, &drawcmd.box.h))
 		eui_drawcmd_push(&drawcmd);
 
 	/* bottom line */
@@ -873,7 +873,7 @@ void eui_draw_box_border(int x, int y, int w, int h, int t, unsigned int color)
 	drawcmd.box.y = y + h - t;
 	drawcmd.box.w = w;
 	drawcmd.box.h = t;
-	if (eui_clip_box(&drawcmd.box.x, &drawcmd.box.y, &drawcmd.box.w, &drawcmd.box.h))
+	if (!eui_clip_box(&drawcmd.box.x, &drawcmd.box.y, &drawcmd.box.w, &drawcmd.box.h))
 		eui_drawcmd_push(&drawcmd);
 
 	/* left line */
@@ -881,7 +881,7 @@ void eui_draw_box_border(int x, int y, int w, int h, int t, unsigned int color)
 	drawcmd.box.y = y + t;
 	drawcmd.box.w = t;
 	drawcmd.box.h = h - t * 2;
-	if (eui_clip_box(&drawcmd.box.x, &drawcmd.box.y, &drawcmd.box.w, &drawcmd.box.h))
+	if (!eui_clip_box(&drawcmd.box.x, &drawcmd.box.y, &drawcmd.box.w, &drawcmd.box.h))
 		eui_drawcmd_push(&drawcmd);
 
 	/* right line */
@@ -889,7 +889,7 @@ void eui_draw_box_border(int x, int y, int w, int h, int t, unsigned int color)
 	drawcmd.box.y = y + t;
 	drawcmd.box.w = t;
 	drawcmd.box.h = h - t * 2;
-	if (eui_clip_box(&drawcmd.box.x, &drawcmd.box.y, &drawcmd.box.w, &drawcmd.box.h))
+	if (!eui_clip_box(&drawcmd.box.x, &drawcmd.box.y, &drawcmd.box.w, &drawcmd.box.h))
 		eui_drawcmd_push(&drawcmd);
 }
 
