@@ -590,14 +590,8 @@ static void eui_drawcmd_push(drawcmd_t *drawcmd)
 /* compare function for sorting drawcmds */
 static int eui_drawcmd_compare(const void *a, const void *b)
 {
-	drawcmd_t *drawcmd_a, *drawcmd_b;
-
-	/* fetch drawcmds */
-	drawcmd_a = &state.drawcmds[*(int *)a];
-	drawcmd_b = &state.drawcmds[*(int *)b];
-
 	/* compare z values */
-	return drawcmd_a->z - drawcmd_b->z;
+	return state.drawcmds[*(int *)a].z - state.drawcmds[*(int *)b].z;
 }
 
 /*
