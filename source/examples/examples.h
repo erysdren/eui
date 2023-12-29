@@ -38,6 +38,9 @@ void example_order(void);
 /* font.c */
 void example_font(void);
 
+/* windows.c */
+void example_windows(void);
+
 #ifdef __cplusplus
 }
 #endif

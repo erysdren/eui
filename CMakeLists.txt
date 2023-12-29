@@ -92,6 +92,26 @@ if(SDL2_FOUND)
 	target_include_directories(font_sdl2_4bpp PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
 	target_link_libraries(font_sdl2_4bpp SDL2::Main)
 
+	# windows
+	add_executable(windows_sdl2
+		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
+		${PROJECT_SOURCE_DIR}/source/examples/windows.c
+		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
+	target_compile_options(windows_sdl2 PUBLIC ${EUI_COMPILE_OPTIONS})
+	target_compile_definitions(windows_sdl2 PUBLIC ${EUI_COMPILE_DEFINITIONS} EXAMPLE_FUNC=example_windows)
+	target_include_directories(windows_sdl2 PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
+	target_link_libraries(windows_sdl2 SDL2::Main)
+
+	# font (4bpp)
+	add_executable(windows_sdl2_4bpp
+		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2_4bpp.c
+		${PROJECT_SOURCE_DIR}/source/examples/windows.c
+		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
+	target_compile_options(windows_sdl2_4bpp PUBLIC ${EUI_COMPILE_OPTIONS})
+	target_compile_definitions(windows_sdl2_4bpp PUBLIC ${EUI_COMPILE_DEFINITIONS} EXAMPLE_FUNC=example_windows)
+	target_include_directories(windows_sdl2_4bpp PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
+	target_link_libraries(windows_sdl2_4bpp SDL2::Main)
+
 endif()
 
 #
