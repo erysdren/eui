@@ -18,6 +18,14 @@ While CMake is used to build the test and example programs, it is not required f
 - Supports 1, 2, 4, 8, 16, and 32 bits-per-pixel drawing.
 - No dynamic memory allocation.
 
+## Todo
+
+- Write full API documentation outside of the header.
+- Re-add previously removed code as optional modules (widgets, shapes, bitmaps).
+- Support segmented memory model with appropriately placed FAR pointers.
+- Support VGA text mode with alternative glyph drawing routines.
+- See about making the Z-index baked into frames and draw commands.
+
 ## Usage
 
 Here is a basic EUI usage example that assumes 4 bit color and the default 16 color VGA palette.
