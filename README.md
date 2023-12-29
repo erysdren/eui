@@ -55,7 +55,8 @@ eui_frame_pop();
 
 ## Configuration Switches
 
-- `EUI_MAX_FRAMES`: Maximum number of nested frames. Default: 64
+- `EUI_MAX_FRAMES`: Maximum number of nested frames. Default: `128`
+- `EUI_MAX_DRAWCMDS`: Maximum number of queueable draw commands. Default: `1024`
 
 ## Source Code Guide
 
