@@ -29,6 +29,22 @@ SOFTWARE.
 extern "C" {
 #endif
 
+#ifndef EXAMPLE_FUNC
+#define EXAMPLE_FUNC example_hello
+#endif
+
+#ifndef EXAMPLE_TITLE
+#define EXAMPLE_TITLE "EUI Example (SDL2)"
+#endif
+
+#ifndef EXAMPLE_WIDTH
+#define EXAMPLE_WIDTH (640)
+#endif
+
+#ifndef EXAMPLE_HEIGHT
+#define EXAMPLE_HEIGHT (480)
+#endif
+
 /* hello.c */
 void example_hello(void);
 
@@ -40,6 +56,9 @@ void example_font(void);
 
 /* windows.c */
 void example_windows(void);
+
+/* standalone.c */
+void example_standalone(void);
 
 #ifdef __cplusplus
 }

@@ -102,7 +102,7 @@ if(SDL2_FOUND)
 	target_include_directories(windows_sdl2 PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
 	target_link_libraries(windows_sdl2 SDL2::Main)
 
-	# font (4bpp)
+	# windows (4bpp)
 	add_executable(windows_sdl2_4bpp
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2_4bpp.c
 		${PROJECT_SOURCE_DIR}/source/examples/windows.c
@@ -111,6 +111,32 @@ if(SDL2_FOUND)
 	target_compile_definitions(windows_sdl2_4bpp PUBLIC ${EUI_COMPILE_DEFINITIONS} EXAMPLE_FUNC=example_windows)
 	target_include_directories(windows_sdl2_4bpp PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
 	target_link_libraries(windows_sdl2_4bpp SDL2::Main)
+
+	# standalone
+	add_executable(standalone_sdl2
+		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
+		${PROJECT_SOURCE_DIR}/source/examples/standalone.c
+		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
+	target_compile_options(standalone_sdl2 PUBLIC ${EUI_COMPILE_OPTIONS})
+	target_compile_definitions(standalone_sdl2 PUBLIC
+		${EUI_COMPILE_DEFINITIONS}
+		EXAMPLE_FUNC=example_standalone
+		EXAMPLE_STANDALONE=1)
+	target_include_directories(standalone_sdl2 PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
+	target_link_libraries(standalone_sdl2 SDL2::Main)
+
+	# standalone (4bpp)
+	add_executable(standalone_sdl2_4bpp
+		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2_4bpp.c
+		${PROJECT_SOURCE_DIR}/source/examples/standalone.c
+		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
+	target_compile_options(standalone_sdl2_4bpp PUBLIC ${EUI_COMPILE_OPTIONS})
+	target_compile_definitions(standalone_sdl2_4bpp PUBLIC
+		${EUI_COMPILE_DEFINITIONS}
+		EXAMPLE_FUNC=example_standalone
+		EXAMPLE_STANDALONE=1)
+	target_include_directories(standalone_sdl2_4bpp PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
+	target_link_libraries(standalone_sdl2_4bpp SDL2::Main)
 
 endif()
 

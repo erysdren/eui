@@ -48,10 +48,6 @@ SOFTWARE.
 #include "eui.h"
 #include "examples.h"
 
-#ifndef EXAMPLE_FUNC
-#define EXAMPLE_FUNC example_hello
-#endif
-
 static uint8_t screen[320 * 200];
 
 /* main */

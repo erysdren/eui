@@ -39,22 +39,6 @@ SOFTWARE.
 
 #include "palette_vga.h"
 
-#ifndef EXAMPLE_FUNC
-#define EXAMPLE_FUNC example_hello
-#endif
-
-#ifndef EXAMPLE_TITLE
-#define EXAMPLE_TITLE "EUI Example (SDL2)"
-#endif
-
-#ifndef EXAMPLE_WIDTH
-#define EXAMPLE_WIDTH (640)
-#endif
-
-#ifndef EXAMPLE_HEIGHT
-#define EXAMPLE_HEIGHT (480)
-#endif
-
 /* SDL2 state */
 static SDL_Window *window;
 static SDL_Surface *surface8;
@@ -63,6 +47,20 @@ static SDL_Renderer *renderer;
 static SDL_Texture *texture;
 static SDL_Rect rect;
 SDL_Color colors[256];
+
+#ifdef EXAMPLE_STANDALONE
+#define MOUSE_GRAB_PADDING (10)
+SDL_HitTestResult hit_test(SDL_Window *window, const SDL_Point *point, void *user)
+{
+	EUI_UNUSED(window);
+	EUI_UNUSED(user);
+
+	if (point->y <= 16)
+		return SDL_HITTEST_DRAGGABLE;
+	else
+		return SDL_HITTEST_NORMAL;
+}
+#endif
 
 /* main */
 int main(int argc, char **argv)
@@ -94,6 +92,11 @@ int main(int argc, char **argv)
 	SDL_RenderClear(renderer);
 	SDL_RenderPresent(renderer);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
+#ifdef EXAMPLE_STANDALONE
+	SDL_SetWindowBordered(window, SDL_FALSE);
+	SDL_SetWindowHitTest(window, hit_test, 0);
+#endif
 
 	/* create our render surface */
 	surface8 = SDL_CreateRGBSurface(0, EXAMPLE_WIDTH, EXAMPLE_HEIGHT, 8, 0, 0, 0, 0);
