@@ -38,6 +38,16 @@ SOFTWARE.
 
 /*
  *
+ * macros
+ *
+ */
+
+#ifndef isqr
+#define isqr(a) ((a) * (a))
+#endif
+
+/*
+ *
  * types
  *
  */
@@ -621,19 +631,28 @@ static font_t font_8x14 = {8, 14, (unsigned char *)font_8x14_bitmap};
  */
 
 static struct {
+
 	frame_t frames[EUI_MAX_FRAMES];
 	int frame_index;
 	int frame_z;
+
 	drawcmd_t drawcmds[EUI_MAX_DRAWCMDS];
 	int num_drawcmds;
 	int drawcmds_order[EUI_MAX_DRAWCMDS];
+
 	int w;
 	int h;
 	int bpp;
 	int pitch;
 	void *buffer;
+
 	font_t *font;
 	int fontnum;
+
+	unsigned char palette[256 * 3];
+	int num_palette_entries;
+	unsigned char clut[256 * 256];
+
 	void (*set_pixel)(int x, int y, unsigned int color);
 	void (*set_box)(int x, int y, int w, int h, unsigned int color);
 	void (*set_glyph)(int x, int y, unsigned int glyph, unsigned int color, font_t *font);
@@ -776,50 +795,6 @@ static void set_box_8(int x, int y, int w, int h, unsigned int color)
 	for (yy = y; yy < y + h; yy++)
 	{
 		memset(&((unsigned char *)state.buffer)[yy * state.pitch + x], color, w);
-	}
-}
-
-static void set_pixel_16(int x, int y, unsigned int color)
-{
-	unsigned short *ofs;
-	ofs = (unsigned short *)((char *)state.buffer + (y * state.pitch) + (x * 2));
-	*ofs = color;
-}
-
-static void set_box_16(int x, int y, int w, int h, unsigned int color)
-{
-	int xx, yy;
-	unsigned short *ofs;
-
-	for (yy = y; yy < y + h; yy++)
-	{
-		for (xx = x; xx < x + w; xx++)
-		{
-			ofs = (unsigned short *)((char *)state.buffer + (yy * state.pitch) + (xx * 2));
-			*ofs = color;
-		}
-	}
-}
-
-static void set_pixel_32(int x, int y, unsigned int color)
-{
-	unsigned int *ofs;
-	ofs = (unsigned int *)((char *)state.buffer + (y * state.pitch) + (x * 4));
-	*ofs = color;
-}
-
-static void set_box_32(int x, int y, int w, int h, unsigned int color)
-{
-	int xx, yy;
-	unsigned int *ofs;
-
-	for (yy = y; yy < y + h; yy++)
-	{
-		for (xx = x; xx < x + w; xx++)
-		{
-			ofs = (unsigned int *)((char *)state.buffer + (yy * state.pitch) + (xx * 4));
-			*ofs = color;
-		}
 	}
 }
 
@@ -984,6 +959,47 @@ static int eui_drawcmd_compare(const void *a, const void *b)
 	return state.drawcmds[*(int *)a].z - state.drawcmds[*(int *)b].z;
 }
 
+/* find closest color in palette */
+/* TODO: should this be public? */
+static int eui_palette_closest(int r, int g, int b)
+{
+	int i, pen, dist, rank;
+	dist = INT_MAX;
+
+	for (i = state.num_palette_entries; i >= 0; i--)
+	{
+		rank = isqr(state.palette[i * 3] - r);
+		rank += isqr(state.palette[(i * 3) + 1] - g);
+		rank += isqr(state.palette[(i * 3) + 2] - b);
+
+		if (rank < dist)
+		{
+			pen = i;
+			dist = rank;
+		}
+	}
+
+	return pen;
+}
+
+/* generate clut */
+static void eui_clut_generate(void)
+{
+	int x, y, r, g, b;
+
+	for (x = 0; x < state.num_palette_entries; x++)
+	{
+		for (y = 0; y < state.num_palette_entries; y++)
+		{
+			r = (state.palette[x * 3] + state.palette[y * 3]) >> 1;
+			g = (state.palette[x * 3 + 1] + state.palette[y * 3 + 1]) >> 1;
+			b = (state.palette[x * 3 + 2] + state.palette[y * 3 + 2]) >> 1;
+
+			state.clut[y * state.num_palette_entries + x] = eui_palette_closest(r, g, b);
+		}
+	}
+}
+
 /*
  *
  * public functions
@@ -1022,16 +1038,6 @@ int eui_init(int w, int h, int bpp, int pitch, void *buffer)
 		case 8:
 			state.set_pixel = set_pixel_8;
 			state.set_box = set_box_8;
-			break;
-
-		case 16:
-			state.set_pixel = set_pixel_16;
-			state.set_box = set_box_16;
-			break;
-
-		case 32:
-			state.set_pixel = set_pixel_32;
-			state.set_box = set_box_32;
 			break;
 
 		default:
@@ -1190,7 +1196,7 @@ int eui_frame_z_get(void)
 }
 
 /*
- * font
+ * font handling
  */
 
 /* set font */
@@ -1217,6 +1223,27 @@ void eui_font_set(int font)
 int eui_font_get(void)
 {
 	return state.fontnum;
+}
+
+/*
+ * palette handling
+ */
+
+/* set internal palette to use for dithering and blending */
+/* returns EUI_FALSE on failure */
+int eui_palette_set(int num_entries, void *entries)
+{
+	if (!num_entries || num_entries > 256)
+		return EUI_FALSE;
+
+	/* copy palette in */
+	memcpy(state.palette, entries, num_entries * 3);
+	state.num_palette_entries = num_entries;
+
+	/* generate clut */
+	eui_clut_generate();
+
+	return EUI_TRUE;
 }
 
 /*
