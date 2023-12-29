@@ -12,11 +12,12 @@ While CMake is used to build the test and example programs, it is not required f
 - Nested frames with relative element positioning and alignment.
 - Automatic text justification.
 - Automatic shape clipping.
-- Built-in 8x8 pixel font.
+- Built-in 8x8 and 8x14 pixel fonts.
 - Integer math only.
 - Draws into a raw pixel buffer by default.
 - Supports 1, 2, 4, 8, 16, and 32 bits-per-pixel drawing.
 - No dynamic memory allocation.
+- Automatic or configurable Z-index for frames.
 
 ## Todo
 
@@ -24,7 +25,6 @@ While CMake is used to build the test and example programs, it is not required f
 - Re-add previously removed code as optional modules (widgets, shapes, bitmaps).
 - Support segmented memory model with appropriately placed FAR pointers.
 - Support VGA text mode with alternative glyph drawing routines.
-- See about making the Z-index baked into frames and draw commands.
 
 ## Usage
 
