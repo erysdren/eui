@@ -15,7 +15,7 @@ While CMake is used to build the test and example programs, it is not required f
 - Built-in 8x8 and 8x14 pixel fonts.
 - Integer math only.
 - Draws into a raw pixel buffer by default.
-- Supports 1, 2, 4, 8, 16, and 32 bits-per-pixel drawing.
+- Supports 1, 2, 4, and 8 bits-per-pixel drawing.
 - No dynamic memory allocation.
 - Automatic or configurable Z-index for frames.
 
