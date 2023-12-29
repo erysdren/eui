@@ -576,24 +576,6 @@ static void eui_drawcmd_push(drawcmd_t *drawcmd)
 	memcpy(&state.drawcmds[++state.num_drawcmds], drawcmd, sizeof(drawcmd_t));
 }
 
-/* currently unused */
-#if 0
-/* pop drawcmd from stack */
-static int eui_drawcmd_pop(drawcmd_t *drawcmd)
-{
-	if (!state.num_drawcmds)
-		return 0;
-
-	/* copy current drawcmd to input */
-	memcpy(drawcmd, &state.drawcmds[state.num_drawcmds], sizeof(drawcmd_t));
-
-	/* clear current drawcmd */
-	memset(&state.drawcmds[state.num_drawcmds], 0, sizeof(drawcmd_t));
-
-	return state.num_drawcmds--;
-}
-#endif
-
 /*
  *
  * public functions
