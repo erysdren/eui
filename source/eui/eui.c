@@ -1241,7 +1241,7 @@ int eui_palette_set(int num_entries, void *entries)
 	state.num_palette_entries = num_entries;
 
 	/* generate clut */
-	eui_clut_generate();
+	/* eui_clut_generate(); */
 
 	return EUI_TRUE;
 }
