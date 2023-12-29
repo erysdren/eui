@@ -56,6 +56,12 @@ enum {
 	EUI_TRUE
 };
 
+/* font */
+enum {
+	EUI_FONT_8X8,
+	EUI_FONT_8X14
+};
+
 /*
  *
  * function prototypes
@@ -115,6 +121,16 @@ void eui_frame_z_set(int z);
 
 /* get z value of current frame */
 int eui_frame_z_get(void);
+
+/*
+ * font
+ */
+
+/* set font */
+void eui_font_set(int font);
+
+/* get font */
+int eui_font_get(void);
 
 /*
  * utilities

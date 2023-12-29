@@ -52,6 +52,16 @@ if(SDL2_FOUND)
 	target_include_directories(order_sdl2 PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
 	target_link_libraries(order_sdl2 SDL2::Main)
 
+	# font
+	add_executable(font_sdl2
+		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
+		${PROJECT_SOURCE_DIR}/source/examples/font.c
+		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
+	target_compile_options(font_sdl2 PUBLIC ${EUI_COMPILE_OPTIONS})
+	target_compile_definitions(font_sdl2 PUBLIC ${EUI_COMPILE_DEFINITIONS} EXAMPLE_FUNC=example_font)
+	target_include_directories(font_sdl2 PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
+	target_link_libraries(font_sdl2 SDL2::Main)
+
 endif()
 
 #

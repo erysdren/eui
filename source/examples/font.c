@@ -22,23 +22,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#pragma once
-#ifndef _EXAMPLES_H_
-#define _EXAMPLES_H_
-#ifdef __cplusplus
-extern "C" {
-#endif
+/*
+ *
+ * FONT.C
+ *
+ */
 
-/* hello.c */
-void example_hello(void);
+#include "eui.h"
 
-/* order.c */
-void example_order(void);
+void example_font(void)
+{
+	/* clear screen */
+	eui_screen_clear(0x01);
 
-/* font.c */
-void example_font(void);
+	/* set alignment to the center of the frame */
+	eui_frame_align_set(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
 
-#ifdef __cplusplus
+	/* draw 192x64 box and draw a 2px border */
+	eui_draw_box(0, 0, 192, 64, 0x0F);
+	eui_draw_box_border(0, 0, 192, 64, 2, 0x02);
+
+	/* create child frame with 8 pixels of padding on each side */
+	eui_frame_push(0, 0, 176, 48);
+
+	/* set child frame alignment to top-left */
+	eui_frame_align_set(EUI_ALIGN_START, EUI_ALIGN_START);
+
+	/* draw a string with the 8x14 font */
+	eui_font_set(EUI_FONT_8X14);
+	eui_draw_text(0, 0, 0x00, "Header Text");
+
+	/* draw horizontal line */
+	eui_draw_box(0, 14, 176, 1, 0x00);
+
+	/* draw a string with the 8x8 font */
+	eui_font_set(EUI_FONT_8X8);
+	eui_draw_text(0, 18, 0x00, "Body Text");
+
+	/* destroy child frame */
+	eui_frame_pop();
 }
-#endif
-#endif /* _EXAMPLES_H_ */
