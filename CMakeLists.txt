@@ -19,11 +19,27 @@ else()
 endif()
 
 # default compile definitions
-set(EUI_COMPILE_DEFINITIONS EUI_PIXEL_DEPTH=8)
+set(EUI_COMPILE_DEFINITIONS)
 
 # print status
 message(STATUS "EUI_COMPILE_OPTIONS: ${EUI_COMPILE_OPTIONS}")
 message(STATUS "EUI_COMPILE_DEFINITIONS: ${EUI_COMPILE_DEFINITIONS}")
+
+#
+# library
+#
+
+add_library(eui ${PROJECT_SOURCE_DIR}/source/eui/eui.c)
+target_compile_options(eui PUBLIC ${EUI_COMPILE_OPTIONS})
+target_compile_definitions(eui PUBLIC ${EUI_COMPILE_DEFINITIONS})
+target_include_directories(eui PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
+
+#
+# install target
+#
+
+set(EUI_HEADERS ${PROJECT_SOURCE_DIR}/source/eui/eui.h)
+include(${PROJECT_SOURCE_DIR}/cmake/install.cmake)
 
 #
 # SDL2 examples
@@ -35,108 +51,84 @@ if(SDL2_FOUND)
 	# hello
 	add_executable(hello_sdl2
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
-		${PROJECT_SOURCE_DIR}/source/examples/hello.c
-		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
-	target_compile_options(hello_sdl2 PUBLIC ${EUI_COMPILE_OPTIONS})
-	target_compile_definitions(hello_sdl2 PUBLIC ${EUI_COMPILE_DEFINITIONS})
-	target_include_directories(hello_sdl2 PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
-	target_link_libraries(hello_sdl2 SDL2::Main)
+		${PROJECT_SOURCE_DIR}/source/examples/hello.c)
+	target_compile_definitions(hello_sdl2 PUBLIC
+		EXAMPLE_FUNC=example_hello)
+	target_link_libraries(hello_sdl2 SDL2::Main eui)
 
 	# hello (4bpp)
 	add_executable(hello_sdl2_4bpp
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2_4bpp.c
-		${PROJECT_SOURCE_DIR}/source/examples/hello.c
-		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
-	target_compile_options(hello_sdl2_4bpp PUBLIC ${EUI_COMPILE_OPTIONS})
-	target_compile_definitions(hello_sdl2_4bpp PUBLIC ${EUI_COMPILE_DEFINITIONS})
-	target_include_directories(hello_sdl2_4bpp PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
-	target_link_libraries(hello_sdl2_4bpp SDL2::Main)
+		${PROJECT_SOURCE_DIR}/source/examples/hello.c)
+	target_compile_definitions(hello_sdl2_4bpp PUBLIC
+		EXAMPLE_FUNC=example_hello)
+	target_link_libraries(hello_sdl2_4bpp SDL2::Main eui)
 
 	# order
 	add_executable(order_sdl2
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
-		${PROJECT_SOURCE_DIR}/source/examples/order.c
-		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
-	target_compile_options(order_sdl2 PUBLIC ${EUI_COMPILE_OPTIONS})
-	target_compile_definitions(order_sdl2 PUBLIC ${EUI_COMPILE_DEFINITIONS} EXAMPLE_FUNC=example_order)
-	target_include_directories(order_sdl2 PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
-	target_link_libraries(order_sdl2 SDL2::Main)
+		${PROJECT_SOURCE_DIR}/source/examples/order.c)
+	target_compile_definitions(order_sdl2 PUBLIC
+		EXAMPLE_FUNC=example_order)
+	target_link_libraries(order_sdl2 SDL2::Main eui)
 
 	# order (4bpp)
 	add_executable(order_sdl2_4bpp
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2_4bpp.c
-		${PROJECT_SOURCE_DIR}/source/examples/order.c
-		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
-	target_compile_options(order_sdl2_4bpp PUBLIC ${EUI_COMPILE_OPTIONS})
-	target_compile_definitions(order_sdl2_4bpp PUBLIC ${EUI_COMPILE_DEFINITIONS} EXAMPLE_FUNC=example_order)
-	target_include_directories(order_sdl2_4bpp PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
-	target_link_libraries(order_sdl2_4bpp SDL2::Main)
+		${PROJECT_SOURCE_DIR}/source/examples/order.c)
+	target_compile_definitions(order_sdl2_4bpp PUBLIC
+		EXAMPLE_FUNC=example_order)
+	target_link_libraries(order_sdl2_4bpp SDL2::Main eui)
 
 	# font
 	add_executable(font_sdl2
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
-		${PROJECT_SOURCE_DIR}/source/examples/font.c
-		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
-	target_compile_options(font_sdl2 PUBLIC ${EUI_COMPILE_OPTIONS})
-	target_compile_definitions(font_sdl2 PUBLIC ${EUI_COMPILE_DEFINITIONS} EXAMPLE_FUNC=example_font)
-	target_include_directories(font_sdl2 PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
-	target_link_libraries(font_sdl2 SDL2::Main)
+		${PROJECT_SOURCE_DIR}/source/examples/font.c)
+	target_compile_definitions(font_sdl2 PUBLIC
+		EXAMPLE_FUNC=example_font)
+	target_link_libraries(font_sdl2 SDL2::Main eui)
 
 	# font (4bpp)
 	add_executable(font_sdl2_4bpp
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2_4bpp.c
-		${PROJECT_SOURCE_DIR}/source/examples/font.c
-		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
-	target_compile_options(font_sdl2_4bpp PUBLIC ${EUI_COMPILE_OPTIONS})
-	target_compile_definitions(font_sdl2_4bpp PUBLIC ${EUI_COMPILE_DEFINITIONS} EXAMPLE_FUNC=example_font)
-	target_include_directories(font_sdl2_4bpp PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
-	target_link_libraries(font_sdl2_4bpp SDL2::Main)
+		${PROJECT_SOURCE_DIR}/source/examples/font.c)
+	target_compile_definitions(font_sdl2_4bpp PUBLIC
+		EXAMPLE_FUNC=example_font)
+	target_link_libraries(font_sdl2_4bpp SDL2::Main eui)
 
 	# windows
 	add_executable(windows_sdl2
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
-		${PROJECT_SOURCE_DIR}/source/examples/windows.c
-		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
-	target_compile_options(windows_sdl2 PUBLIC ${EUI_COMPILE_OPTIONS})
-	target_compile_definitions(windows_sdl2 PUBLIC ${EUI_COMPILE_DEFINITIONS} EXAMPLE_FUNC=example_windows)
-	target_include_directories(windows_sdl2 PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
-	target_link_libraries(windows_sdl2 SDL2::Main)
+		${PROJECT_SOURCE_DIR}/source/examples/windows.c)
+	target_compile_definitions(windows_sdl2 PUBLIC
+		EXAMPLE_FUNC=example_windows)
+	target_link_libraries(windows_sdl2 SDL2::Main eui)
 
 	# windows (4bpp)
 	add_executable(windows_sdl2_4bpp
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2_4bpp.c
-		${PROJECT_SOURCE_DIR}/source/examples/windows.c
-		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
-	target_compile_options(windows_sdl2_4bpp PUBLIC ${EUI_COMPILE_OPTIONS})
-	target_compile_definitions(windows_sdl2_4bpp PUBLIC ${EUI_COMPILE_DEFINITIONS} EXAMPLE_FUNC=example_windows)
-	target_include_directories(windows_sdl2_4bpp PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
-	target_link_libraries(windows_sdl2_4bpp SDL2::Main)
+		${PROJECT_SOURCE_DIR}/source/examples/windows.c)
+	target_compile_definitions(windows_sdl2_4bpp PUBLIC
+		EXAMPLE_FUNC=example_windows)
+	target_link_libraries(windows_sdl2_4bpp SDL2::Main eui)
 
 	# standalone
 	add_executable(standalone_sdl2
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
-		${PROJECT_SOURCE_DIR}/source/examples/standalone.c
-		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
-	target_compile_options(standalone_sdl2 PUBLIC ${EUI_COMPILE_OPTIONS})
+		${PROJECT_SOURCE_DIR}/source/examples/standalone.c)
 	target_compile_definitions(standalone_sdl2 PUBLIC
-		${EUI_COMPILE_DEFINITIONS}
 		EXAMPLE_FUNC=example_standalone
 		EXAMPLE_STANDALONE=1)
-	target_include_directories(standalone_sdl2 PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
-	target_link_libraries(standalone_sdl2 SDL2::Main)
+	target_link_libraries(standalone_sdl2 SDL2::Main eui)
 
 	# standalone (4bpp)
 	add_executable(standalone_sdl2_4bpp
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2_4bpp.c
-		${PROJECT_SOURCE_DIR}/source/examples/standalone.c
-		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
-	target_compile_options(standalone_sdl2_4bpp PUBLIC ${EUI_COMPILE_OPTIONS})
+		${PROJECT_SOURCE_DIR}/source/examples/standalone.c)
 	target_compile_definitions(standalone_sdl2_4bpp PUBLIC
-		${EUI_COMPILE_DEFINITIONS}
 		EXAMPLE_FUNC=example_standalone
 		EXAMPLE_STANDALONE=1)
-	target_include_directories(standalone_sdl2_4bpp PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
-	target_link_libraries(standalone_sdl2_4bpp SDL2::Main)
+	target_link_libraries(standalone_sdl2_4bpp SDL2::Main eui)
 
 endif()
 
@@ -149,19 +141,42 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL DOS)
 	# hello
 	add_executable(hello_dos
 		${PROJECT_SOURCE_DIR}/source/examples/harness_dos.c
-		${PROJECT_SOURCE_DIR}/source/examples/hello.c
-		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
-	target_compile_options(hello_dos PUBLIC ${EUI_COMPILE_OPTIONS})
-	target_compile_definitions(hello_dos PUBLIC ${EUI_COMPILE_DEFINITIONS})
-	target_include_directories(hello_dos PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
+		${PROJECT_SOURCE_DIR}/source/examples/hello.c)
+	target_compile_definitions(hello_dos PUBLIC
+		EXAMPLE_FUNC=example_hello)
+	target_link_libraries(hello_dos eui)
 
 	# order
 	add_executable(order_dos
 		${PROJECT_SOURCE_DIR}/source/examples/harness_dos.c
-		${PROJECT_SOURCE_DIR}/source/examples/order.c
-		${PROJECT_SOURCE_DIR}/source/eui/eui.c)
-	target_compile_options(order_dos PUBLIC ${EUI_COMPILE_OPTIONS})
-	target_compile_definitions(order_dos PUBLIC ${EUI_COMPILE_DEFINITIONS} EXAMPLE_FUNC=example_order)
-	target_include_directories(order_dos PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
+		${PROJECT_SOURCE_DIR}/source/examples/order.c)
+	target_compile_definitions(order_dos PUBLIC
+		EXAMPLE_FUNC=example_order)
+	target_link_libraries(order_dos eui)
+
+	# font
+	add_executable(font_dos
+		${PROJECT_SOURCE_DIR}/source/examples/harness_dos.c
+		${PROJECT_SOURCE_DIR}/source/examples/font.c)
+	target_compile_definitions(font_dos PUBLIC
+		EXAMPLE_FUNC=example_font)
+	target_link_libraries(font_dos eui)
+
+	# windows
+	add_executable(windows_dos
+		${PROJECT_SOURCE_DIR}/source/examples/harness_dos.c
+		${PROJECT_SOURCE_DIR}/source/examples/windows.c)
+	target_compile_definitions(windows_dos PUBLIC
+		EXAMPLE_FUNC=example_windows)
+	target_link_libraries(windows_dos eui)
+
+	# standalone
+	add_executable(standalone_dos
+		${PROJECT_SOURCE_DIR}/source/examples/harness_dos.c
+		${PROJECT_SOURCE_DIR}/source/examples/standalone.c)
+	target_compile_definitions(standalone_dos PUBLIC
+		EXAMPLE_FUNC=example_standalone
+		EXAMPLE_STANDALONE=1)
+	target_link_libraries(standalone_dos eui)
 
 endif()
