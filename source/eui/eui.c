@@ -183,11 +183,31 @@ static unsigned char font8x8_basic[128][8] = {
 #define EUI_MAX_FRAMES (64)
 #endif
 
+#ifndef EUI_MAX_DRAWCMDS
+#define EUI_MAX_DRAWCMDS (1024)
+#endif
+
 /*
  *
  * types
  *
  */
+
+/* draw command type */
+enum {
+	DRAW_NONE,
+	DRAW_PIXEL,
+	DRAW_BOX,
+	DRAW_GLYPH
+};
+
+/* draw command */
+typedef union drawcmd_t {
+	int type;
+	struct { int type; int x; int y; unsigned int color; } pixel;
+	struct { int type; int x; int y; int w; int h; unsigned int color; } box;
+	struct { int type; int x; int y; unsigned int glyph; unsigned int color; } glyph;
+} drawcmd_t;
 
 /* frame */
 typedef struct frame_t {
@@ -208,6 +228,8 @@ typedef struct frame_t {
 static struct {
 	frame_t frames[EUI_MAX_FRAMES];
 	int frame_index;
+	drawcmd_t drawcmds[EUI_MAX_DRAWCMDS];
+	int num_drawcmds;
 	int w;
 	int h;
 	int bpp;
@@ -544,6 +566,34 @@ static int eui_clip_box(int *x, int *y, int *w, int *h)
 	}
 }
 
+/* push drawcmd to stack */
+static void eui_drawcmd_push(drawcmd_t *drawcmd)
+{
+	if (state.num_drawcmds == EUI_MAX_DRAWCMDS - 1)
+		return;
+
+	/* copy current drawcmd to input */
+	memcpy(&state.drawcmds[++state.num_drawcmds], drawcmd, sizeof(drawcmd_t));
+}
+
+/* currently unused */
+#if 0
+/* pop drawcmd from stack */
+static int eui_drawcmd_pop(drawcmd_t *drawcmd)
+{
+	if (!state.num_drawcmds)
+		return 0;
+
+	/* copy current drawcmd to input */
+	memcpy(drawcmd, &state.drawcmds[state.num_drawcmds], sizeof(drawcmd_t));
+
+	/* clear current drawcmd */
+	memset(&state.drawcmds[state.num_drawcmds], 0, sizeof(drawcmd_t));
+
+	return state.num_drawcmds--;
+}
+#endif
+
 /*
  *
  * public functions
@@ -626,6 +676,7 @@ void eui_quit(void)
 int eui_context_begin(void)
 {
 	state.frame_index = 0;
+	state.num_drawcmds = 0;
 	if (!eui_frame_push(0, 0, state.w, state.h))
 		return EUI_FALSE;
 
@@ -635,7 +686,28 @@ int eui_context_begin(void)
 /* end current eui context and destroy root frame */
 void eui_context_end(void)
 {
+	drawcmd_t *drawcmd;
+	int i;
 
+	/* go through drawcmd queue */
+	for (i = 1; i <= state.num_drawcmds; i++)
+	{
+		drawcmd = &state.drawcmds[i];
+		switch (drawcmd->type)
+		{
+			case DRAW_PIXEL:
+				state.set_pixel(drawcmd->pixel.x, drawcmd->pixel.y, drawcmd->pixel.color);
+				break;
+
+			case DRAW_BOX:
+				state.set_box(drawcmd->box.x, drawcmd->box.y, drawcmd->box.w, drawcmd->box.h, drawcmd->box.color);
+				break;
+
+			case DRAW_GLYPH:
+				state.set_glyph(drawcmd->glyph.x, drawcmd->glyph.y, drawcmd->glyph.glyph, drawcmd->glyph.color);
+				break;
+		}
+	}
 }
 
 /*
@@ -761,49 +833,64 @@ const char *eui_error_string(int code)
 /* draw box */
 void eui_draw_box(int x, int y, int w, int h, unsigned int color)
 {
+	drawcmd_t drawcmd;
+
 	eui_transform_box(&x, &y, w, h);
 
-	if (eui_clip_box(&x, &y, &w, &h))
-		state.set_box(x, y, w, h, color);
+	/* setup drawcmd */
+	drawcmd.type = DRAW_BOX;
+	drawcmd.box.color = color;
+
+	drawcmd.box.x = x;
+	drawcmd.box.y = y;
+	drawcmd.box.w = w;
+	drawcmd.box.h = h;
+	if (eui_clip_box(&drawcmd.box.x, &drawcmd.box.y, &drawcmd.box.w, &drawcmd.box.h))
+		eui_drawcmd_push(&drawcmd);
 }
 
 /* draw box border */
 void eui_draw_box_border(int x, int y, int w, int h, int t, unsigned int color)
 {
-	int lx, ly, lw, lh;
+	drawcmd_t drawcmd;
+
 	eui_transform_box(&x, &y, w, h);
 
+	/* setup drawcmd */
+	drawcmd.type = DRAW_BOX;
+	drawcmd.box.color = color;
+
 	/* top line */
-	lx = x;
-	ly = y;
-	lw = w;
-	lh = t;
-	if (eui_clip_box(&lx, &ly, &lw, &lh))
-		state.set_box(lx, ly, lw, lh, color);
+	drawcmd.box.x = x;
+	drawcmd.box.y = y;
+	drawcmd.box.w = w;
+	drawcmd.box.h = t;
+	if (eui_clip_box(&drawcmd.box.x, &drawcmd.box.y, &drawcmd.box.w, &drawcmd.box.h))
+		eui_drawcmd_push(&drawcmd);
 
 	/* bottom line */
-	lx = x;
-	ly = y + h - t;
-	lw = w;
-	lh = t;
-	if (eui_clip_box(&lx, &ly, &lw, &lh))
-		state.set_box(lx, ly, lw, lh, color);
+	drawcmd.box.x = x;
+	drawcmd.box.y = y + h - t;
+	drawcmd.box.w = w;
+	drawcmd.box.h = t;
+	if (eui_clip_box(&drawcmd.box.x, &drawcmd.box.y, &drawcmd.box.w, &drawcmd.box.h))
+		eui_drawcmd_push(&drawcmd);
 
 	/* left line */
-	lx = x;
-	ly = y + t;
-	lw = t;
-	lh = h - t * 2;
-	if (eui_clip_box(&lx, &ly, &lw, &lh))
-		state.set_box(lx, ly, lw, lh, color);
+	drawcmd.box.x = x;
+	drawcmd.box.y = y + t;
+	drawcmd.box.w = t;
+	drawcmd.box.h = h - t * 2;
+	if (eui_clip_box(&drawcmd.box.x, &drawcmd.box.y, &drawcmd.box.w, &drawcmd.box.h))
+		eui_drawcmd_push(&drawcmd);
 
 	/* right line */
-	lx = x + w - t;
-	ly = y + t;
-	lw = t;
-	lh = h - t * 2;
-	if (eui_clip_box(&lx, &ly, &lw, &lh))
-		state.set_box(lx, ly, lw, lh, color);
+	drawcmd.box.x = x + w - t;
+	drawcmd.box.y = y + t;
+	drawcmd.box.w = t;
+	drawcmd.box.h = h - t * 2;
+	if (eui_clip_box(&drawcmd.box.x, &drawcmd.box.y, &drawcmd.box.w, &drawcmd.box.h))
+		eui_drawcmd_push(&drawcmd);
 }
 
 /* draw text */
@@ -814,6 +901,7 @@ void eui_draw_text(int x, int y, unsigned int color, char *s)
 	char *ptr;
 	int w, h;
 	unsigned int len = 0;
+	drawcmd_t drawcmd;
 
 	/* get text size */
 	if (!eui_get_text_dimensions(&w, &h, s))
@@ -821,6 +909,10 @@ void eui_draw_text(int x, int y, unsigned int color, char *s)
 
 	/* transform to size */
 	eui_transform_box(&x, &y, w, h);
+
+	/* setup drawcmd */
+	drawcmd.type = DRAW_GLYPH;
+	drawcmd.glyph.color = color;
 
 	/* draw string */
 	start_x = x;
@@ -859,7 +951,10 @@ void eui_draw_text(int x, int y, unsigned int color, char *s)
 		}
 		else
 		{
-			state.set_glyph(x, y, c, color);
+			drawcmd.glyph.x = x;
+			drawcmd.glyph.y = y;
+			drawcmd.glyph.glyph = c;
+			eui_drawcmd_push(&drawcmd);
 			x += state.glyph_w;
 		}
 	}
