@@ -959,6 +959,7 @@ static int eui_drawcmd_compare(const void *a, const void *b)
 	return state.drawcmds[*(int *)a].z - state.drawcmds[*(int *)b].z;
 }
 
+#if 0
 /* find closest color in palette */
 /* TODO: should this be public? */
 static int eui_palette_closest(int r, int g, int b)
@@ -999,6 +1000,7 @@ static void eui_clut_generate(void)
 		}
 	}
 }
+#endif
 
 /*
  *
@@ -1240,8 +1242,10 @@ int eui_palette_set(int num_entries, void *entries)
 	memcpy(state.palette, entries, num_entries * 3);
 	state.num_palette_entries = num_entries;
 
+#if 0
 	/* generate clut */
-	/* eui_clut_generate(); */
+	eui_clut_generate();
+#endif
 
 	return EUI_TRUE;
 }
