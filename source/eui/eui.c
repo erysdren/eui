@@ -180,7 +180,7 @@ static unsigned char font8x8_basic[128][8] = {
  */
 
 #ifndef EUI_MAX_FRAMES
-#define EUI_MAX_FRAMES (64)
+#define EUI_MAX_FRAMES (128)
 #endif
 
 #ifndef EUI_MAX_DRAWCMDS
