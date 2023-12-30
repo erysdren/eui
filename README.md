@@ -64,7 +64,7 @@ eui_frame_pop();
 
 - [`eui.c`](./source/eui/eui.c) & [`eui.h`](./source/eui/eui.h): Base drawing primitives.
 - [`eui_evnt.c`](./source/eui/eui_evnt.c) & [`eui_evnt.h`](./source/eui/eui_evnt.h): User input and event handling.
-- [`eui_sdl2.c`](./source/eui/eui_sdl2.c) & [`eui_sdl2.h`](./source/eui/eui_sdl2.h): Bridge between SDL2 and EUI event handling.
+- [`eui_sdl2.c`](./source/eui/eui_sdl2.c) & [`eui_sdl2.h`](./source/eui/eui_sdl2.h): Bridge between SDL2 and EUI for event handling.
 
 ### Examples
 
