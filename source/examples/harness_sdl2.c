@@ -34,7 +34,7 @@ SOFTWARE.
 
 #include "SDL.h"
 
-#include "eui.h"
+#include "eui_sdl2.h"
 #include "examples.h"
 
 #include "palette_vga.h"
@@ -46,7 +46,8 @@ static SDL_Surface *surface32;
 static SDL_Renderer *renderer;
 static SDL_Texture *texture;
 static SDL_Rect rect;
-SDL_Color colors[256];
+static SDL_Color colors[256];
+static SDL_Event event;
 
 #ifdef EXAMPLE_STANDALONE
 #define MOUSE_GRAB_PADDING (10)
@@ -134,6 +135,13 @@ int main(int argc, char **argv)
 	/* main loop */
 	while (!SDL_QuitRequested())
 	{
+		/* push events */
+		while (SDL_PollEvent(&event))
+			eui_sdl2_event_push(&event);
+
+		/* process events */
+		eui_event_queue_process();
+
 		/* clear screen */
 		SDL_FillRect(surface8, NULL, 0x00);
 

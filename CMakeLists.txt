@@ -29,7 +29,9 @@ message(STATUS "EUI_COMPILE_DEFINITIONS: ${EUI_COMPILE_DEFINITIONS}")
 # library
 #
 
-add_library(eui ${PROJECT_SOURCE_DIR}/source/eui/eui.c)
+add_library(eui
+	${PROJECT_SOURCE_DIR}/source/eui/eui.c
+	${PROJECT_SOURCE_DIR}/source/eui/eui_evnt.c)
 target_compile_options(eui PRIVATE ${EUI_COMPILE_OPTIONS})
 target_compile_definitions(eui PUBLIC ${EUI_COMPILE_DEFINITIONS})
 target_include_directories(eui PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
@@ -50,6 +52,7 @@ if(SDL2_FOUND)
 
 	# hello
 	add_executable(hello_sdl2
+		${PROJECT_SOURCE_DIR}/source/eui/eui_sdl2.c
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
 		${PROJECT_SOURCE_DIR}/source/examples/hello.c)
 	target_compile_definitions(hello_sdl2 PUBLIC
@@ -58,6 +61,7 @@ if(SDL2_FOUND)
 
 	# hello (4bpp)
 	add_executable(hello_sdl2_4bpp
+		${PROJECT_SOURCE_DIR}/source/eui/eui_sdl2.c
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2_4bpp.c
 		${PROJECT_SOURCE_DIR}/source/examples/hello.c)
 	target_compile_definitions(hello_sdl2_4bpp PUBLIC
@@ -66,6 +70,7 @@ if(SDL2_FOUND)
 
 	# order
 	add_executable(order_sdl2
+		${PROJECT_SOURCE_DIR}/source/eui/eui_sdl2.c
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
 		${PROJECT_SOURCE_DIR}/source/examples/order.c)
 	target_compile_definitions(order_sdl2 PUBLIC
@@ -74,6 +79,7 @@ if(SDL2_FOUND)
 
 	# order (4bpp)
 	add_executable(order_sdl2_4bpp
+		${PROJECT_SOURCE_DIR}/source/eui/eui_sdl2.c
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2_4bpp.c
 		${PROJECT_SOURCE_DIR}/source/examples/order.c)
 	target_compile_definitions(order_sdl2_4bpp PUBLIC
@@ -82,6 +88,7 @@ if(SDL2_FOUND)
 
 	# font
 	add_executable(font_sdl2
+		${PROJECT_SOURCE_DIR}/source/eui/eui_sdl2.c
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
 		${PROJECT_SOURCE_DIR}/source/examples/font.c)
 	target_compile_definitions(font_sdl2 PUBLIC
@@ -90,6 +97,7 @@ if(SDL2_FOUND)
 
 	# font (4bpp)
 	add_executable(font_sdl2_4bpp
+		${PROJECT_SOURCE_DIR}/source/eui/eui_sdl2.c
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2_4bpp.c
 		${PROJECT_SOURCE_DIR}/source/examples/font.c)
 	target_compile_definitions(font_sdl2_4bpp PUBLIC
@@ -98,6 +106,7 @@ if(SDL2_FOUND)
 
 	# windows
 	add_executable(windows_sdl2
+		${PROJECT_SOURCE_DIR}/source/eui/eui_sdl2.c
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
 		${PROJECT_SOURCE_DIR}/source/examples/windows.c)
 	target_compile_definitions(windows_sdl2 PUBLIC
@@ -106,6 +115,7 @@ if(SDL2_FOUND)
 
 	# windows (4bpp)
 	add_executable(windows_sdl2_4bpp
+		${PROJECT_SOURCE_DIR}/source/eui/eui_sdl2.c
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2_4bpp.c
 		${PROJECT_SOURCE_DIR}/source/examples/windows.c)
 	target_compile_definitions(windows_sdl2_4bpp PUBLIC
@@ -114,6 +124,7 @@ if(SDL2_FOUND)
 
 	# standalone
 	add_executable(standalone_sdl2
+		${PROJECT_SOURCE_DIR}/source/eui/eui_sdl2.c
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
 		${PROJECT_SOURCE_DIR}/source/examples/standalone.c)
 	target_compile_definitions(standalone_sdl2 PUBLIC
@@ -123,12 +134,31 @@ if(SDL2_FOUND)
 
 	# standalone (4bpp)
 	add_executable(standalone_sdl2_4bpp
+		${PROJECT_SOURCE_DIR}/source/eui/eui_sdl2.c
 		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2_4bpp.c
 		${PROJECT_SOURCE_DIR}/source/examples/standalone.c)
 	target_compile_definitions(standalone_sdl2_4bpp PUBLIC
 		EXAMPLE_FUNC=example_standalone
 		EXAMPLE_STANDALONE=1)
 	target_link_libraries(standalone_sdl2_4bpp SDL2::Main eui)
+
+	# cursor
+	add_executable(cursor_sdl2
+		${PROJECT_SOURCE_DIR}/source/eui/eui_sdl2.c
+		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
+		${PROJECT_SOURCE_DIR}/source/examples/cursor.c)
+	target_compile_definitions(cursor_sdl2 PUBLIC
+		EXAMPLE_FUNC=example_cursor)
+	target_link_libraries(cursor_sdl2 SDL2::Main eui)
+
+	# cursor (4bpp)
+	add_executable(cursor_sdl2_4bpp
+		${PROJECT_SOURCE_DIR}/source/eui/eui_sdl2.c
+		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2_4bpp.c
+		${PROJECT_SOURCE_DIR}/source/examples/cursor.c)
+	target_compile_definitions(cursor_sdl2_4bpp PUBLIC
+		EXAMPLE_FUNC=example_cursor)
+	target_link_libraries(cursor_sdl2_4bpp SDL2::Main eui)
 
 endif()
 

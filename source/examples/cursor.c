@@ -22,48 +22,44 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#pragma once
-#ifndef _EXAMPLES_H_
-#define _EXAMPLES_H_
-#ifdef __cplusplus
-extern "C" {
-#endif
+/*
+ *
+ * CURSOR.C
+ *
+ */
 
-#ifndef EXAMPLE_FUNC
-#define EXAMPLE_FUNC example_hello
-#endif
+#include "eui_evnt.h"
 
-#ifndef EXAMPLE_TITLE
-#define EXAMPLE_TITLE "EUI Example (SDL2)"
-#endif
+void example_cursor(void)
+{
+	int cursor_x, cursor_y;
 
-#ifndef EXAMPLE_WIDTH
-#define EXAMPLE_WIDTH (640)
-#endif
+	/* clear screen */
+	eui_screen_clear(0x01);
 
-#ifndef EXAMPLE_HEIGHT
-#define EXAMPLE_HEIGHT (480)
-#endif
+	/* set alignment to the center of the frame */
+	eui_frame_align_set(EUI_ALIGN_MIDDLE, EUI_ALIGN_MIDDLE);
 
-/* hello.c */
-void example_hello(void);
+	/* draw 192x64 box and draw a 2px border */
+	eui_draw_box(0, 0, 192, 64, 0x0F);
+	eui_draw_box_border(0, 0, 192, 64, 2, 0x02);
 
-/* order.c */
-void example_order(void);
+	/* create child frame with 8 pixels of padding on each side */
+	eui_frame_push(0, 0, 176, 48);
 
-/* font.c */
-void example_font(void);
+	/* set child frame alignment to top-left */
+	eui_frame_align_set(EUI_ALIGN_START, EUI_ALIGN_START);
 
-/* windows.c */
-void example_windows(void);
+	/* draw a string with the default 8x8 font */
+	eui_draw_text(0, 0, 0x00, "Hello, world!");
 
-/* standalone.c */
-void example_standalone(void);
+	/* destroy child frame */
+	eui_frame_pop();
 
-/* cursor.c */
-void example_cursor(void);
+	/* set alignment to the top left of the frame */
+	eui_frame_align_set(EUI_ALIGN_START, EUI_ALIGN_START);
 
-#ifdef __cplusplus
+	/* draw cursor box */
+	eui_cursor_read(&cursor_x, &cursor_y);
+	eui_draw_box(cursor_x, cursor_y, 4, 4, 0x0E);
 }
-#endif
-#endif /* _EXAMPLES_H_ */

@@ -23,47 +23,26 @@ SOFTWARE.
 */
 
 #pragma once
-#ifndef _EXAMPLES_H_
-#define _EXAMPLES_H_
+#ifndef _EUI_SDL2_H_
+#define _EUI_SDL2_H_
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifndef EXAMPLE_FUNC
-#define EXAMPLE_FUNC example_hello
-#endif
+#include "eui.h"
+#include "eui_evnt.h"
+#include "SDL.h"
 
-#ifndef EXAMPLE_TITLE
-#define EXAMPLE_TITLE "EUI Example (SDL2)"
-#endif
+/*
+ *
+ * public functions
+ *
+ */
 
-#ifndef EXAMPLE_WIDTH
-#define EXAMPLE_WIDTH (640)
-#endif
-
-#ifndef EXAMPLE_HEIGHT
-#define EXAMPLE_HEIGHT (480)
-#endif
-
-/* hello.c */
-void example_hello(void);
-
-/* order.c */
-void example_order(void);
-
-/* font.c */
-void example_font(void);
-
-/* windows.c */
-void example_windows(void);
-
-/* standalone.c */
-void example_standalone(void);
-
-/* cursor.c */
-void example_cursor(void);
+/* process and push SDL2 event */
+void eui_sdl2_event_push(SDL_Event *event);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* _EXAMPLES_H_ */
+#endif /* _EUI_SDL2_H_ */
