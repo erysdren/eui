@@ -13,11 +13,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 # default compile options
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-		set(EUI_COMPILE_OPTIONS -std=c89 -pedantic -Wall -Wextra)
-	else()
-		set(EUI_COMPILE_OPTIONS)
-	endif()
+	set(EUI_COMPILE_OPTIONS -std=c89 -pedantic -Wall -Wextra)
 else()
 	set(EUI_COMPILE_OPTIONS)
 endif()
@@ -34,7 +30,7 @@ message(STATUS "EUI_COMPILE_DEFINITIONS: ${EUI_COMPILE_DEFINITIONS}")
 #
 
 add_library(eui ${PROJECT_SOURCE_DIR}/source/eui/eui.c)
-target_compile_options(eui PUBLIC ${EUI_COMPILE_OPTIONS})
+target_compile_options(eui PRIVATE ${EUI_COMPILE_OPTIONS})
 target_compile_definitions(eui PUBLIC ${EUI_COMPILE_DEFINITIONS})
 target_include_directories(eui PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
 
