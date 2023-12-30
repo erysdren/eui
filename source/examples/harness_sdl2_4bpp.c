@@ -130,7 +130,6 @@ int main(int argc, char **argv)
 
 	/* init eui */
 	eui_init(surface4->w, surface4->h, surface4->format->BitsPerPixel, surface4->pitch, surface4->pixels);
-	eui_palette_set(16, palette_windows);
 
 	/* main loop */
 	while (!SDL_QuitRequested())

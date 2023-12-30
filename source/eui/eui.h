@@ -141,14 +141,6 @@ void eui_font_set(int font);
 int eui_font_get(void);
 
 /*
- * palette handling
- */
-
-/* set internal palette to use for dithering and blending */
-/* returns EUI_FALSE on failure */
-int eui_palette_set(int num_entries, void *entries);
-
-/*
  * utilities
  */
 

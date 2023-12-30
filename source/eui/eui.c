@@ -649,10 +649,6 @@ static struct {
 	font_t *font;
 	int fontnum;
 
-	unsigned char palette[256 * 3];
-	int num_palette_entries;
-	unsigned char clut[256 * 256];
-
 	void (*set_pixel)(int x, int y, unsigned int color);
 	void (*set_box)(int x, int y, int w, int h, unsigned int color);
 	void (*set_glyph)(int x, int y, unsigned int glyph, unsigned int color, font_t *font);
@@ -959,49 +955,6 @@ static int eui_drawcmd_compare(const void *a, const void *b)
 	return state.drawcmds[*(int *)a].z - state.drawcmds[*(int *)b].z;
 }
 
-#if 0
-/* find closest color in palette */
-/* TODO: should this be public? */
-static int eui_palette_closest(int r, int g, int b)
-{
-	int i, pen, dist, rank;
-	dist = INT_MAX;
-
-	for (i = state.num_palette_entries; i >= 0; i--)
-	{
-		rank = isqr(state.palette[i * 3] - r);
-		rank += isqr(state.palette[(i * 3) + 1] - g);
-		rank += isqr(state.palette[(i * 3) + 2] - b);
-
-		if (rank < dist)
-		{
-			pen = i;
-			dist = rank;
-		}
-	}
-
-	return pen;
-}
-
-/* generate clut */
-static void eui_clut_generate(void)
-{
-	int x, y, r, g, b;
-
-	for (x = 0; x < state.num_palette_entries; x++)
-	{
-		for (y = 0; y < state.num_palette_entries; y++)
-		{
-			r = (state.palette[x * 3] + state.palette[y * 3]) >> 1;
-			g = (state.palette[x * 3 + 1] + state.palette[y * 3 + 1]) >> 1;
-			b = (state.palette[x * 3 + 2] + state.palette[y * 3 + 2]) >> 1;
-
-			state.clut[y * 256 + x] = (unsigned char)eui_palette_closest(r, g, b);
-		}
-	}
-}
-#endif
-
 /*
  *
  * public functions
@@ -1225,29 +1178,6 @@ void eui_font_set(int font)
 int eui_font_get(void)
 {
 	return state.fontnum;
-}
-
-/*
- * palette handling
- */
-
-/* set internal palette to use for dithering and blending */
-/* returns EUI_FALSE on failure */
-int eui_palette_set(int num_entries, void *entries)
-{
-	if (!num_entries || num_entries > 256)
-		return EUI_FALSE;
-
-	/* copy palette in */
-	memcpy(state.palette, entries, num_entries * 3);
-	state.num_palette_entries = num_entries;
-
-#if 0
-	/* generate clut */
-	eui_clut_generate();
-#endif
-
-	return EUI_TRUE;
 }
 
 /*
