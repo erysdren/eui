@@ -67,6 +67,10 @@ eui_frame_pop();
 ### Examples
 
 - [`hello.c`](./source/examples/hello.c): "Hello, World!".
+- [`order.c`](./source/examples/order.c): Z-ordering example.
+- [`font.c`](./source/examples/font.c): Font switching example.
+- [`windows.c`](./source/examples/windows.c): Windows 3.1 themed example with two windows.
+- [`standalone.c`](./source/examples/standalone.c): Windows 3.1 styled window with no border.
 - [`harness_dos.c`](./source/examples/harness_dos.c): MS-DOS implementation and example harness.
 - [`harness_sdl2.c`](./source/examples/harness_sdl2.c): SDL2 implementation and example harness.
 
