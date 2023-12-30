@@ -154,6 +154,13 @@ int eui_get_text_dimensions(int *w, int *h, char *s);
 /* convert error code to printable string */
 const char *eui_error_string(int code);
 
+/* transform box to current frame with alignment */
+void eui_transform_box(int *x, int *y, int w, int h);
+
+/* clip box to current frame and screen size */
+/* returns EUI_TRUE if the box will be completely clipped away */
+int eui_clip_box(int *x, int *y, int *w, int *h);
+
 /*
  * drawing primitives
  */

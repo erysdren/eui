@@ -820,40 +820,6 @@ static void set_glyph_font_bitmap(int x, int y, unsigned int glyph, unsigned int
 	}
 }
 
-/* transform box to current frame, with alignment */
-static void eui_transform_box(int *x, int *y, int w, int h)
-{
-	switch (state.frames[state.frame_index].align.x)
-	{
-		case EUI_ALIGN_START:
-			*x += state.frames[state.frame_index].x;
-			break;
-		case EUI_ALIGN_MIDDLE:
-			*x += state.frames[state.frame_index].x + state.frames[state.frame_index].w / 2 - w / 2;
-			break;
-		case EUI_ALIGN_END:
-			*x += state.frames[state.frame_index].x + state.frames[state.frame_index].w - w;
-			break;
-		default:
-			break;
-	}
-
-	switch (state.frames[state.frame_index].align.y)
-	{
-		case EUI_ALIGN_START:
-			*y += state.frames[state.frame_index].y;
-			break;
-		case EUI_ALIGN_MIDDLE:
-			*y += state.frames[state.frame_index].y + state.frames[state.frame_index].h / 2 - h / 2;
-			break;
-		case EUI_ALIGN_END:
-			*y += state.frames[state.frame_index].y + state.frames[state.frame_index].h - h;
-			break;
-		default:
-			break;
-	}
-}
-
 /* clip box to arbitrary size, returns EUI_TRUE if the shape will be completely clipped */
 static int eui_clip_box_lower(int *x, int *y, int *w, int *h, int cx, int cy, int cw, int ch)
 {
@@ -901,33 +867,6 @@ static int eui_clip_box_lower(int *x, int *y, int *w, int *h, int cx, int cy, in
 	}
 
 	return EUI_FALSE;
-}
-
-/* clip box to current frame and screen size, returns EUI_TRUE if the shape will be completely clipped */
-static int eui_clip_box(int *x, int *y, int *w, int *h)
-{
-	if (state.frames[state.frame_index].clip)
-	{
-		int frame_x, frame_y, frame_w, frame_h;
-
-		/* save frame coordinates */
-		frame_x = state.frames[state.frame_index].x;
-		frame_y = state.frames[state.frame_index].y;
-		frame_w = state.frames[state.frame_index].w;
-		frame_h = state.frames[state.frame_index].h;
-
-		/* clip frame to screen */
-		if (eui_clip_box_lower(&frame_x, &frame_y, &frame_w, &frame_h, 0, 0, state.w, state.h))
-			return EUI_TRUE;
-
-		/* clip shape to frame */
-		return eui_clip_box_lower(x, y, w, h, frame_x, frame_y, frame_w, frame_h);
-	}
-	else
-	{
-		/* clip shape to screen */
-		return eui_clip_box_lower(x, y, w, h, 0, 0, state.w, state.h);
-	}
 }
 
 /* push drawcmd to stack */
@@ -1246,6 +1185,68 @@ const char *eui_error_string(int code)
 {
 	EUI_UNUSED(code);
 	return NULL;
+}
+
+/* transform box to current frame with alignment */
+void eui_transform_box(int *x, int *y, int w, int h)
+{
+	switch (state.frames[state.frame_index].align.x)
+	{
+		case EUI_ALIGN_START:
+			*x += state.frames[state.frame_index].x;
+			break;
+		case EUI_ALIGN_MIDDLE:
+			*x += state.frames[state.frame_index].x + state.frames[state.frame_index].w / 2 - w / 2;
+			break;
+		case EUI_ALIGN_END:
+			*x += state.frames[state.frame_index].x + state.frames[state.frame_index].w - w;
+			break;
+		default:
+			break;
+	}
+
+	switch (state.frames[state.frame_index].align.y)
+	{
+		case EUI_ALIGN_START:
+			*y += state.frames[state.frame_index].y;
+			break;
+		case EUI_ALIGN_MIDDLE:
+			*y += state.frames[state.frame_index].y + state.frames[state.frame_index].h / 2 - h / 2;
+			break;
+		case EUI_ALIGN_END:
+			*y += state.frames[state.frame_index].y + state.frames[state.frame_index].h - h;
+			break;
+		default:
+			break;
+	}
+}
+
+/* clip box to current frame and screen size */
+/* returns EUI_TRUE if the box will be completely clipped away */
+int eui_clip_box(int *x, int *y, int *w, int *h)
+{
+	if (state.frames[state.frame_index].clip)
+	{
+		int frame_x, frame_y, frame_w, frame_h;
+
+		/* save frame coordinates */
+		frame_x = state.frames[state.frame_index].x;
+		frame_y = state.frames[state.frame_index].y;
+		frame_w = state.frames[state.frame_index].w;
+		frame_h = state.frames[state.frame_index].h;
+
+		/* clip frame to screen */
+		if (eui_clip_box_lower(&frame_x, &frame_y, &frame_w, &frame_h, 0, 0, state.w, state.h))
+			return EUI_TRUE;
+
+		/* clip shape to frame */
+		return eui_clip_box_lower(x, y, w, h, frame_x, frame_y, frame_w, frame_h);
+	}
+	else
+	{
+		/* clip shape to screen */
+		return eui_clip_box_lower(x, y, w, h, 0, 0, state.w, state.h);
+	}
 }
 
 /*
