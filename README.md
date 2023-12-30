@@ -73,6 +73,7 @@ eui_frame_pop();
 - [`font.c`](./source/examples/font.c): Font switching example.
 - [`windows.c`](./source/examples/windows.c): Windows 3.1 themed example with two windows.
 - [`standalone.c`](./source/examples/standalone.c): Windows 3.1 styled window with no border.
+- [`cursor.c`](./source/examples/cursor.c): Draw box at cursor location.
 - [`harness_dos.c`](./source/examples/harness_dos.c): MS-DOS implementation and example harness.
 - [`harness_sdl2.c`](./source/examples/harness_sdl2.c): SDL2 implementation and example harness.
 
