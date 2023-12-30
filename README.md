@@ -76,10 +76,12 @@ eui_frame_pop();
 
 ## Tested Compilers & Platforms
 
-- GCC (Linux, Windows, DOS16, DOS32)
-- Clang (Linux)
-- Watcom (DOS16, DOS32)
-- TCC (Linux)
+- Borland C++ 3.1 (MS-DOS)
+- Clang 14.0.6 (Linux)
+- GCC 6.3.0 (IA16)
+- GCC 12.2.0 (Linux, Windows, MS-DOS)
+- Open Watcom v2 (MS-DOS)
+- TCC 0.9.27 (Linux)
 
 ## Credits
 
