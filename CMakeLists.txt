@@ -31,7 +31,8 @@ message(STATUS "EUI_COMPILE_DEFINITIONS: ${EUI_COMPILE_DEFINITIONS}")
 
 add_library(eui
 	${PROJECT_SOURCE_DIR}/source/eui/eui.c
-	${PROJECT_SOURCE_DIR}/source/eui/eui_evnt.c)
+	${PROJECT_SOURCE_DIR}/source/eui/eui_evnt.c
+	${PROJECT_SOURCE_DIR}/source/eui/eui_widg.c)
 target_compile_options(eui PRIVATE ${EUI_COMPILE_OPTIONS})
 target_compile_definitions(eui PUBLIC ${EUI_COMPILE_DEFINITIONS})
 target_include_directories(eui PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
@@ -159,6 +160,24 @@ if(SDL2_FOUND)
 	target_compile_definitions(cursor_sdl2_4bpp PUBLIC
 		EXAMPLE_FUNC=example_cursor)
 	target_link_libraries(cursor_sdl2_4bpp SDL2::Main eui)
+
+	# widgets
+	add_executable(widgets_sdl2
+		${PROJECT_SOURCE_DIR}/source/eui/eui_sdl2.c
+		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
+		${PROJECT_SOURCE_DIR}/source/examples/widgets.c)
+	target_compile_definitions(widgets_sdl2 PUBLIC
+		EXAMPLE_FUNC=example_widgets)
+	target_link_libraries(widgets_sdl2 SDL2::Main eui)
+
+	# widgets (4bpp)
+	add_executable(widgets_sdl2_4bpp
+		${PROJECT_SOURCE_DIR}/source/eui/eui_sdl2.c
+		${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2_4bpp.c
+		${PROJECT_SOURCE_DIR}/source/examples/widgets.c)
+	target_compile_definitions(widgets_sdl2_4bpp PUBLIC
+		EXAMPLE_FUNC=example_widgets)
+	target_link_libraries(widgets_sdl2_4bpp SDL2::Main eui)
 
 endif()
 
