@@ -38,17 +38,7 @@ SOFTWARE.
 
 /*
  *
- * macros
- *
- */
-
-#ifndef isqr
-#define isqr(a) ((a) * (a))
-#endif
-
-/*
- *
- * types
+ * enums
  *
  */
 
@@ -59,6 +49,12 @@ enum {
 	DRAW_BOX,
 	DRAW_GLYPH
 };
+
+/*
+ *
+ * types
+ *
+ */
 
 /* font */
 typedef struct font_t {
