@@ -13,7 +13,11 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 # default compile options
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-	set(EUI_COMPILE_OPTIONS -std=c89 -pedantic -Wall -Wextra)
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+		set(EUI_COMPILE_OPTIONS -std=c89 -pedantic -Wall -Wextra)
+	else()
+		set(EUI_COMPILE_OPTIONS)
+	endif()
 else()
 	set(EUI_COMPILE_OPTIONS)
 endif()
