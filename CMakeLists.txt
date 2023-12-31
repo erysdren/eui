@@ -41,12 +41,19 @@ target_compile_options(eui PRIVATE ${EUI_COMPILE_OPTIONS})
 target_compile_definitions(eui PRIVATE ${EUI_COMPILE_DEFINITIONS})
 target_include_directories(eui PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
 
-add_library(eui_sdl2
-		${PROJECT_SOURCE_DIR}/source/eui/eui_sdl2.c)
-target_compile_options(eui_sdl2 PRIVATE ${EUI_COMPILE_OPTIONS})
-target_compile_definitions(eui_sdl2 PRIVATE ${EUI_COMPILE_DEFINITIONS})
-target_include_directories(eui_sdl2 PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
-target_link_libraries(eui_sdl2 SDL2::Main eui)
+#
+# SDL2 helper library
+#
+
+find_package(SDL2)
+if(SDL2_FOUND)
+	add_library(eui_sdl2
+			${PROJECT_SOURCE_DIR}/source/eui/eui_sdl2.c)
+	target_compile_options(eui_sdl2 PRIVATE ${EUI_COMPILE_OPTIONS})
+	target_compile_definitions(eui_sdl2 PRIVATE ${EUI_COMPILE_DEFINITIONS})
+	target_include_directories(eui_sdl2 PUBLIC ${PROJECT_SOURCE_DIR}/source/eui)
+	target_link_libraries(eui_sdl2 SDL2::Main eui)
+endif()
 
 #
 # install target
@@ -67,7 +74,6 @@ if(EUI_BUILD_EXAMPLES)
 	# SDL2 examples
 	#
 
-	find_package(SDL2)
 	if(SDL2_FOUND)
 
 		# hello
