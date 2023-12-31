@@ -36,11 +36,11 @@ extern "C" {
  */
 
 #ifndef EUI_MAX_FRAMES
-#define EUI_MAX_FRAMES (128)
+#define EUI_MAX_FRAMES (1024)
 #endif
 
 #ifndef EUI_MAX_DRAWCMDS
-#define EUI_MAX_DRAWCMDS (1024)
+#define EUI_MAX_DRAWCMDS (8192)
 #endif
 
 #define EUI_UNUSED(x) ((void)(x))
