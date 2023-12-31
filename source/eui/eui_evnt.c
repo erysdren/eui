@@ -43,7 +43,14 @@ SOFTWARE.
  */
 
 /* keyboard state */
-static char keys[256] = {0};
+static unsigned char keys[256] = {0};
+
+/* key buffer */
+#define KEY_BUFFER_SIZE (64)
+#define KEY_BUFFER_ADVANCE(x) ((x) = ((x) + 1) & (KEY_BUFFER_SIZE - 1))
+static int key_buffer[KEY_BUFFER_SIZE] = {0};
+static int key_buffer_ridx = 0;
+static int key_buffer_widx = 0;
 
 /* cursor state */
 static int cursor_x = 0;
@@ -83,6 +90,41 @@ int eui_button_read(void)
 }
 
 /*
+ * keyboard handling
+ */
+
+/* get pointer to array of chars defining what keys are currently pressed */
+const unsigned char *eui_key_state_get(int *num_keys)
+{
+	if (num_keys)
+		*num_keys = 256;
+	return (const unsigned char *)keys;
+}
+
+/* push key to the queue */
+void eui_key_push(int scancode)
+{
+	key_buffer[key_buffer_widx] = scancode;
+	KEY_BUFFER_ADVANCE(key_buffer_widx);
+	if (key_buffer_widx == key_buffer_ridx)
+		KEY_BUFFER_ADVANCE(key_buffer_ridx);
+}
+
+/* pop key from the top of the queue */
+int eui_key_pop(void)
+{
+	int res = -1;
+
+	if (key_buffer_ridx == key_buffer_widx)
+		return res;
+
+	res = key_buffer[key_buffer_ridx];
+	KEY_BUFFER_ADVANCE(key_buffer_ridx);
+
+	return res;
+}
+
+/*
  * event handling
  */
 
@@ -99,6 +141,7 @@ int eui_event_queue_process(void)
 		{
 			case EUI_EVENT_KEY_DOWN:
 				keys[event.key.scancode] = EUI_TRUE;
+				eui_key_push(event.key.scancode);
 				break;
 
 			case EUI_EVENT_KEY_UP:

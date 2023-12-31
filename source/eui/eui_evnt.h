@@ -181,6 +181,19 @@ void eui_cursor_read(int *x, int *y);
 int eui_button_read(void);
 
 /*
+ * keyboard handling
+ */
+
+/* get pointer to array of chars defining what keys are currently pressed */
+const unsigned char *eui_key_state_get(int *num_keys);
+
+/* push key to the queue */
+void eui_key_push(int scancode);
+
+/* pop key from the top of the queue */
+int eui_key_pop(void);
+
+/*
  * event handling
  */
 
