@@ -90,6 +90,27 @@ int eui_button_read(void)
 }
 
 /*
+ * utilities
+ */
+
+/* returns EUI_TRUE if the cursor is hovering over the given box */
+int eui_cursor_hovering(int x, int y, int w, int h)
+{
+	int cursor_x, cursor_y;
+
+	eui_cursor_read(&cursor_x, &cursor_y);
+
+	eui_transform_box(&x, &y, w, h);
+
+	if (cursor_x < x || cursor_x > x + w)
+		return EUI_FALSE;
+	if (cursor_y < y || cursor_y > y + h)
+		return EUI_FALSE;
+
+	return EUI_TRUE;
+}
+
+/*
  * keyboard handling
  */
 

@@ -181,6 +181,13 @@ void eui_cursor_read(int *x, int *y);
 int eui_button_read(void);
 
 /*
+ * utilities
+ */
+
+/* returns EUI_TRUE if the cursor is hovering over the given box */
+int eui_cursor_hovering(int x, int y, int w, int h);
+
+/*
  * keyboard handling
  */
 

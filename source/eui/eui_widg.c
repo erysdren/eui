@@ -38,28 +38,6 @@ SOFTWARE.
 
 /*
  *
- * private functions
- *
- */
-
-static int eui_is_hovered(int x, int y, int w, int h)
-{
-	int cursor_x, cursor_y;
-
-	eui_cursor_read(&cursor_x, &cursor_y);
-
-	eui_transform_box(&x, &y, w, h);
-
-	if (cursor_x < x || cursor_x > x + w)
-		return EUI_FALSE;
-	if (cursor_y < y || cursor_y > y + h)
-		return EUI_FALSE;
-
-	return EUI_TRUE;
-}
-
-/*
- *
  * public functions
  *
  */
@@ -72,7 +50,7 @@ int eui_widget_button(int x, int y, int w, int h, char *label, void (*callback)(
 	int button;
 	int hovered;
 
-	hovered = eui_is_hovered(x, y, w, h);
+	hovered = eui_cursor_hovering(x, y, w, h);
 
 	button = eui_button_read();
 
