@@ -86,14 +86,10 @@ eui_frame_pop();
 - Open Watcom v2 (MS-DOS)
 - TCC 0.9.27 (Linux)
 
-## Projects Using EUI
-
-- [Wolfenstein Interactive Editor](https://github.com/erysdren/wolfie)
-
 ## Credits
 
+- [Ada](https://thingvellir.net/)
 - [SUI](https://github.com/shpuld/sui-qc/) (License: MIT)
-- [Danelaw](https://thingvellir.net/git/danelaw/) (License: CC0 1.0)
 - [SDL2 CMake modules](https://github.com/aminosbh/sdl2-cmake-modules) (License: BSD-3)
 
 ## License
