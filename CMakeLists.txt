@@ -9,7 +9,7 @@ project(EUI
 )
 set(CMAKE_C_STANDARD 90)
 set(CMAKE_C_STANDARD_REQUIRED TRUE)
-list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/external/sdl2-cmake-modules")
 
 # options
 option(EUI_BUILD_EXAMPLES "Build Example Applications" ON)
