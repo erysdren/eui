@@ -177,6 +177,9 @@ void eui_draw_text(int x, int y, unsigned int color, char *s);
 /* draw formatted text */
 void eui_draw_textf(int x, int y, unsigned int color, char *s, ...);
 
+/* draw bitmap */
+void eui_draw_bitmap(int x, int y, int w, int h, int bpp, int pitch, void *pixels);
+
 #ifdef __cplusplus
 }
 #endif

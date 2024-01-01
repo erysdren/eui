@@ -190,6 +190,14 @@ if(EUI_BUILD_EXAMPLES)
 			EXAMPLE_FUNC=example_widgets)
 		target_link_libraries(widgets_sdl2_4bpp eui_sdl2)
 
+		# bitmap
+		add_executable(bitmap_sdl2
+			${PROJECT_SOURCE_DIR}/source/examples/harness_sdl2.c
+			${PROJECT_SOURCE_DIR}/source/examples/bitmap.c)
+		target_compile_definitions(bitmap_sdl2 PUBLIC
+			EXAMPLE_FUNC=example_bitmap)
+		target_link_libraries(bitmap_sdl2 eui_sdl2)
+
 	endif()
 
 	#

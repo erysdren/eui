@@ -63,6 +63,9 @@ void example_standalone(void);
 /* cursor.c */
 void example_cursor(void);
 
+/* bitmap.c */
+void example_bitmap(void);
+
 #ifdef __cplusplus
 }
 #endif

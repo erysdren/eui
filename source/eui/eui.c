@@ -47,7 +47,8 @@ enum {
 	DRAW_NONE,
 	DRAW_PIXEL,
 	DRAW_BOX,
-	DRAW_GLYPH
+	DRAW_GLYPH,
+	DRAW_BITMAP
 };
 
 /*
@@ -71,6 +72,7 @@ typedef struct drawcmd_t {
 		struct { int x; int y; unsigned int color; } pixel;
 		struct { int x; int y; int w; int h; unsigned int color; } box;
 		struct { int x; int y; unsigned int glyph; unsigned int color; font_t *font; } glyph;
+		struct { int x; int y; int w; int h; int bpp; int pitch; void *pixels; } bitmap;
 	} cmd;
 } drawcmd_t;
 
@@ -648,6 +650,7 @@ static struct {
 	void (*set_pixel)(int x, int y, unsigned int color);
 	void (*set_box)(int x, int y, int w, int h, unsigned int color);
 	void (*set_glyph)(int x, int y, unsigned int glyph, unsigned int color, font_t *font);
+	void (*set_bitmap)(int x, int y, int w, int h, int bpp, int pitch, void *pixels);
 } state;
 
 /*
@@ -820,6 +823,54 @@ static void set_glyph_font_bitmap(int x, int y, unsigned int glyph, unsigned int
 	}
 }
 
+void set_bitmap_1(int x, int y, int w, int h, int bpp, int pitch, void *pixels)
+{
+	EUI_UNUSED(x);
+	EUI_UNUSED(y);
+	EUI_UNUSED(w);
+	EUI_UNUSED(h);
+	EUI_UNUSED(bpp);
+	EUI_UNUSED(pitch);
+	EUI_UNUSED(pixels);
+}
+
+void set_bitmap_2(int x, int y, int w, int h, int bpp, int pitch, void *pixels)
+{
+	EUI_UNUSED(x);
+	EUI_UNUSED(y);
+	EUI_UNUSED(w);
+	EUI_UNUSED(h);
+	EUI_UNUSED(bpp);
+	EUI_UNUSED(pitch);
+	EUI_UNUSED(pixels);
+}
+
+void set_bitmap_4(int x, int y, int w, int h, int bpp, int pitch, void *pixels)
+{
+	EUI_UNUSED(x);
+	EUI_UNUSED(y);
+	EUI_UNUSED(w);
+	EUI_UNUSED(h);
+	EUI_UNUSED(bpp);
+	EUI_UNUSED(pitch);
+	EUI_UNUSED(pixels);
+}
+
+void set_bitmap_8(int x, int y, int w, int h, int bpp, int pitch, void *pixels)
+{
+	int yy;
+	void *src, *dst;
+
+	EUI_UNUSED(bpp);
+
+	for (yy = y; yy < y + h; yy++)
+	{
+		src = (char *)pixels + ((yy - y) * pitch);
+		dst = (char *)state.buffer + (yy * state.pitch + x);
+		memcpy(dst, src, w);
+	}
+}
+
 /* clip box to arbitrary size, returns EUI_TRUE if the shape will be completely clipped */
 static int eui_clip_box_lower(int *x, int *y, int *w, int *h, int cx, int cy, int cw, int ch)
 {
@@ -913,21 +964,25 @@ int eui_init(int w, int h, int bpp, int pitch, void *buffer)
 		case 1:
 			state.set_pixel = set_pixel_1;
 			state.set_box = set_box_1;
+			state.set_bitmap = set_bitmap_1;
 			break;
 
 		case 2:
 			state.set_pixel = set_pixel_2;
 			state.set_box = set_box_2;
+			state.set_bitmap = set_bitmap_2;
 			break;
 
 		case 4:
 			state.set_pixel = set_pixel_4;
 			state.set_box = set_box_4;
+			state.set_bitmap = set_bitmap_4;
 			break;
 
 		case 8:
 			state.set_pixel = set_pixel_8;
 			state.set_box = set_box_8;
+			state.set_bitmap = set_bitmap_8;
 			break;
 
 		default:
@@ -997,7 +1052,16 @@ void eui_context_end(void)
 				break;
 
 			case DRAW_GLYPH:
-				state.set_glyph(drawcmd->cmd.glyph.x, drawcmd->cmd.glyph.y, drawcmd->cmd.glyph.glyph, drawcmd->cmd.glyph.color, drawcmd->cmd.glyph.font);
+				state.set_glyph(drawcmd->cmd.glyph.x, drawcmd->cmd.glyph.y,
+					drawcmd->cmd.glyph.glyph, drawcmd->cmd.glyph.color,
+					drawcmd->cmd.glyph.font);
+				break;
+
+			case DRAW_BITMAP:
+				state.set_bitmap(drawcmd->cmd.bitmap.x, drawcmd->cmd.bitmap.y,
+					drawcmd->cmd.bitmap.w, drawcmd->cmd.bitmap.h,
+					drawcmd->cmd.bitmap.bpp, drawcmd->cmd.bitmap.pitch,
+					drawcmd->cmd.bitmap.pixels);
 				break;
 		}
 	}
@@ -1395,4 +1459,30 @@ void eui_draw_textf(int x, int y, unsigned int color, char *s, ...)
 	va_end(args);
 
 	eui_draw_text(x, y, color, buffer);
+}
+
+
+/* draw bitmap */
+void eui_draw_bitmap(int x, int y, int w, int h, int bpp, int pitch, void *pixels)
+{
+	drawcmd_t drawcmd;
+
+	if (!w || !h || !bpp || !pitch || !pixels)
+		return;
+	if (bpp != state.bpp)
+		return;
+
+	/* transform */
+	eui_transform_box(&x, &y, w, h);
+
+	/* push drawcmd */
+	drawcmd.type = DRAW_BITMAP;
+	drawcmd.cmd.bitmap.x = x;
+	drawcmd.cmd.bitmap.y = y;
+	drawcmd.cmd.bitmap.w = w;
+	drawcmd.cmd.bitmap.h = h;
+	drawcmd.cmd.bitmap.bpp = bpp;
+	drawcmd.cmd.bitmap.pitch = pitch;
+	drawcmd.cmd.bitmap.pixels = pixels;
+	eui_drawcmd_push(&drawcmd);
 }
