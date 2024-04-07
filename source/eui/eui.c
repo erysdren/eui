@@ -1125,7 +1125,7 @@ void eui_frame_clip_set(int clip)
 	state.frames[state.frame_index].clip = clip ? EUI_TRUE : EUI_FALSE;
 }
 
-/* returns EUI_TRUE if clipping is enabled for this frame  */
+/* returns EUI_TRUE if clipping is enabled for this frame */
 int eui_frame_clip_get(void)
 {
 	return state.frames[state.frame_index].clip ? EUI_TRUE : EUI_FALSE;
