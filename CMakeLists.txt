@@ -13,6 +13,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/external/sdl2-cmake-modules
 
 # options
 option(EUI_BUILD_EXAMPLES "Build Example Applications" ON)
+option(EUI_BUILD_EDITOR "Build Example Editor" OFF)
 option(EUI_INSTALL_TARGET "Enable Install Target" ON)
 
 # default compile options
@@ -249,4 +250,16 @@ if(EUI_BUILD_EXAMPLES)
 
 	endif()
 
+endif()
+
+#
+# bitmap editor
+#
+
+if(EUI_BUILD_EDITOR AND SDL2_FOUND)
+	add_executable(editor
+		${PROJECT_SOURCE_DIR}/source/editor/tinyfiledialogs.c
+		${PROJECT_SOURCE_DIR}/source/editor/editor.c)
+	target_compile_definitions(editor PUBLIC)
+	target_link_libraries(editor SDL2::Main eui eui_sdl2)
 endif()
