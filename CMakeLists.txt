@@ -59,7 +59,7 @@ if(EUI_BUILD_EXAMPLES)
 			if(${example} STREQUAL "standalone")
 				target_compile_definitions(${example}_sdl2 PUBLIC EXAMPLE_STANDALONE=1)
 			endif()
-			target_link_libraries(${example}_sdl2 eui_sdl2 SDL2::SDL2)
+			target_link_libraries(${example}_sdl2 eui_sdl2)
 		endforeach()
 
 		# 4bpp
@@ -73,7 +73,7 @@ if(EUI_BUILD_EXAMPLES)
 			if(${example} STREQUAL "standalone")
 				target_compile_definitions(${example}_sdl2_4bpp PUBLIC EXAMPLE_STANDALONE=1)
 			endif()
-			target_link_libraries(${example}_sdl2_4bpp eui_sdl2 SDL2::SDL2)
+			target_link_libraries(${example}_sdl2_4bpp eui_sdl2)
 		endforeach()
 	endif()
 
