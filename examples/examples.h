@@ -63,6 +63,9 @@ void example_standalone(void);
 /* cursor.c */
 void example_cursor(void);
 
+/* widgets.c */
+void example_widgets(void);
+
 /* bitmap.c */
 void example_bitmap(void);
 
