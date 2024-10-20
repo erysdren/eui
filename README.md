@@ -1,11 +1,15 @@
 
-# EUI
+# eui
 
-EUI is a small UI and drawing library designed for homebrew games, debug UIs, embedded systems, and low resolution or low color depth displays.
+eui is a small UI and drawing library designed for homebrew games, debug UIs,
+embedded systems, and low resolution or low color depth displays.
 
-The base EUI library is only two files, [`eui.c`](./source/eui/eui.c) and [`eui.h`](./source/eui/eui.h). To add EUI to your project, just clone the files into your source tree and compile.
+The base eui library is only two files, [`eui.c`](./source/eui/eui.c) and
+[`eui.h`](./source/eui/eui.h). To add eui to your project, just clone the files
+into your source tree and compile.
 
-While CMake is used to build the test and example programs, it is not required for EUI itself.
+While CMake is used to build the test and example programs, it is not required
+for eui itself.
 
 ## Features
 
@@ -28,7 +32,7 @@ While CMake is used to build the test and example programs, it is not required f
 
 ## Usage
 
-Here is a basic EUI usage example that assumes 4 bit color and the default 16 color VGA palette.
+Here is a basic eui usage example that assumes 4 bit color and the default 16 color VGA palette.
 
 ```c
 /* set alignment to the center of the frame */
