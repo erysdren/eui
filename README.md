@@ -94,7 +94,6 @@ eui_frame_pop();
 
 - [Ada](https://thingvellir.net/)
 - [SUI](https://github.com/shpuld/sui-qc/) (License: MIT)
-- [SDL2 CMake modules](https://github.com/aminosbh/sdl2-cmake-modules) (License: BSD-3)
 
 ## License
 
