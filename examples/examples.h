@@ -34,7 +34,7 @@ extern "C" {
 #endif
 
 #ifndef EXAMPLE_TITLE
-#define EXAMPLE_TITLE "EUI Example (SDL2)"
+#define EXAMPLE_TITLE "EUI Example"
 #endif
 
 #ifndef EXAMPLE_WIDTH
