@@ -1,6 +1,6 @@
 /*
 MIT License
-Copyright (c) 2023-2024 erysdren (it/she/they)
+Copyright (c) 2023-2025 erysdren (it/its)
 Copyright (c) 2023 Ada <ada@thingvellir.net>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
