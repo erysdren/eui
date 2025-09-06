@@ -1,6 +1,7 @@
 
 # cmake builds
 /**/cmake-build*/
+/**/build*/
 
 # local only
 /**/untracked*/
