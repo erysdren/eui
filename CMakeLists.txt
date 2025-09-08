@@ -48,7 +48,7 @@ endif()
 
 # sdl3 bridge library
 find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3)
-if(SDL2_FOUND)
+if(SDL3_FOUND)
 	add_library(eui_sdl3)
 
 	target_sources(eui_sdl3 PRIVATE
