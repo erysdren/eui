@@ -14,6 +14,8 @@ option(EUI_BUILD_EXAMPLES "Build EUI Examples" ON)
 
 add_library(eui)
 
+add_library(eui::eui ALIAS eui)
+
 target_sources(eui PRIVATE
 	${PROJECT_SOURCE_DIR}/source/eui.c
 	${PROJECT_SOURCE_DIR}/source/eui_evnt.c
@@ -26,12 +28,21 @@ endif()
 
 set_target_properties(eui PROPERTIES C_STANDARD 90 C_STANDARD_REQUIRED ON)
 
-target_include_directories(eui PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(eui
+	PUBLIC
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+		$<INSTALL_INTERFACE:include>
+	PRIVATE
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/source>
+)
 
 # sdl2 bridge library
+
 find_package(SDL2 REQUIRED CONFIG REQUIRED COMPONENTS SDL2)
 if(SDL2_FOUND)
 	add_library(eui_sdl2)
+
+	add_library(eui::sdl2 ALIAS eui_sdl2)
 
 	target_sources(eui_sdl2 PRIVATE
 		${PROJECT_SOURCE_DIR}/source/eui_sdl2.c
@@ -47,9 +58,12 @@ if(SDL2_FOUND)
 endif()
 
 # sdl3 bridge library
+
 find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3)
 if(SDL3_FOUND)
 	add_library(eui_sdl3)
+
+	add_library(eui::sdl3 ALIAS eui_sdl3)
 
 	target_sources(eui_sdl3 PRIVATE
 		${PROJECT_SOURCE_DIR}/source/eui_sdl3.c
@@ -151,3 +165,42 @@ if(EUI_BUILD_EXAMPLES)
 	endif()
 
 endif()
+
+# install
+
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+configure_file(${PROJECT_SOURCE_DIR}/cmake/eui.pc.in ${PROJECT_BINARY_DIR}/eui.pc @ONLY)
+write_basic_package_version_file(${PROJECT_BINARY_DIR}/eui-config-version.cmake COMPATIBILITY AnyNewerVersion)
+
+install(
+	FILES ${PROJECT_BINARY_DIR}/eui.pc
+	DESTINATION lib/pkgconfig
+)
+
+install(
+	TARGETS eui
+	EXPORT eui-targets
+	INCLUDES DESTINATION include
+)
+
+install(
+	EXPORT eui-targets
+	DESTINATION lib/cmake
+	NAMESPACE eui::
+	FILE eui-config.cmake
+)
+
+install(
+	FILES ${PROJECT_BINARY_DIR}/eui-config-version.cmake
+	DESTINATION lib/cmake
+)
+
+install(
+	DIRECTORY
+	"${PROJECT_SOURCE_DIR}/include/"
+	TYPE INCLUDE
+	FILES_MATCHING PATTERN "*.h"
+)
+
